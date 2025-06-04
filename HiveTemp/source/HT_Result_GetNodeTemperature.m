@@ -1,6 +1,7 @@
 %  This file is part of project HiveTemp.
 %
-%  Copyright (c) 2022 Montpellier-University, AltRD-Emmanuel Ruffio
+%  Copyright (c) 2022 Montpellier-University
+%  Copyright (c) 2023-2025 AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@alt-rd.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -32,6 +33,11 @@
 %             it is interpolated.
 %     .timeVector = [vector] Column vector containing the time steps used by the
 %             simulation
+%     .merge = true/[false] If true, existing cell array in node list are expanded
+%             first and all data are put in the same matrix. THe returned type is
+%             a matrix.
+%             If false, the returned type is a cell array whose element are matrices
+%             corresponding to the nodes list
 %
 % Output arguments:
 % Temperature matrix T (dim nNodes x nt)
@@ -39,7 +45,7 @@ function [T] = HT_Result_GetNodeTemperature(nodes, Tmatrix, Tnodes, varargin)
   HT_ImportConstants();
 
   assert(nargin >= 3, 'Missing input arguments');
-  assert(ischar(nodes) || (iscell(nodes) && all(cellfun(@(v) ischar(v), nodes))), 'Invalid nodes');
+  assert(ischar(nodes) || iscell(nodes), 'Invalid nodes');
   assert(isnumeric(Tmatrix) && (size(Tmatrix,1) == numel(Tnodes)), 'Invalid temperature matrix or node list');
 
   % Convert node name to cell array of name (of size 1)
@@ -50,7 +56,7 @@ function [T] = HT_Result_GetNodeTemperature(nodes, Tmatrix, Tnodes, varargin)
   assert(numel(prop) == numel(value), 'Invalid properties');
 
   if HT_VAR_STRICT_INPUT_PARAMETERS
-    lFieldNames = {'index', 'time', 'timevector'};
+    lFieldNames = {'index', 'time', 'timevector', 'merge'};
     lFieldTest = prop;
     tf = ismember(lFieldTest, lFieldNames);
     assert(all(tf), sprintf('Invalid parameter name: %s', strjoin(cellfun(@(v) sprintf('%s',v), lFieldTest(tf), 'UniformOutput', false))));
@@ -59,7 +65,8 @@ function [T] = HT_Result_GetNodeTemperature(nodes, Tmatrix, Tnodes, varargin)
 
   lParams = struct( 'index', 1:size(Tmatrix,2), ...
                     'time', [], ....
-                    'timevector', []);
+                    'timevector', [], ...
+                    'merge', true);
 
   for k=1:numel(prop)
     lParams = setfield(lParams, prop{k}, value{k});
@@ -67,29 +74,45 @@ function [T] = HT_Result_GetNodeTemperature(nodes, Tmatrix, Tnodes, varargin)
 
   if isempty(lParams.time), lParams.time = lParams.timevector; endif;
 
-  if ~isempty(lParams.time) && ~isempty(lParams.timevector)
-    T = NaN(numel(nodes), numel(lParams.time));
+  if lParams.merge
+    % If one element of <nodes> is a cell array ?
+    if any(cellfun(@(v) iscell(v), nodes))
+      nodes = HT_CellUnwrap(nodes);
+      assert(all(cellfun(@(v) ischar(v), nodes)), 'Invalid node names');
+    endif
 
-    for k=1:numel(nodes)
-      lMatchIndex = find(strcmpi(Tnodes, nodes{k}));
-      assert(~isempty(lMatchIndex), sprintf('Node name <%s> could not be found in the node list', nodes{k}));
-      assert(numel(lMatchIndex)==1, 'Node name was found multiple times');
-      T(k,:) = interp1(lParams.timevector, Tmatrix(lMatchIndex,:), lParams.time, 'linear');
-    endfor
-  elseif ~isempty(lParams.index)
-    T = NaN(numel(nodes), numel(lParams.index));
+    if ~isempty(lParams.time) && ~isempty(lParams.timevector)
+      T = NaN(numel(nodes), numel(lParams.time));
 
-    for k=1:numel(nodes)
-      lMatchIndex = find(strcmpi(Tnodes, nodes{k}));
-      assert(~isempty(lMatchIndex), sprintf('Node name <%s> could not be found in the node list', nodes{k}));
-      assert(numel(lMatchIndex)==1, 'Node name was found multiple times');
-      T(k,:) = Tmatrix(lMatchIndex,lParams.index);
+      for k=1:numel(nodes)
+        lMatchIndex = find(strcmpi(Tnodes, nodes{k}));
+        assert(~isempty(lMatchIndex), sprintf('Node name <%s> could not be found in the node list', nodes{k}));
+        assert(numel(lMatchIndex)==1, 'Node name was found multiple times');
+        T(k,:) = interp1(lParams.timevector, Tmatrix(lMatchIndex,:), lParams.time, 'linear');
+      endfor
+    elseif ~isempty(lParams.index)
+      T = NaN(numel(nodes), numel(lParams.index));
+
+      for k=1:numel(nodes)
+        lMatchIndex = find(strcmpi(Tnodes, nodes{k}));
+        assert(~isempty(lMatchIndex), sprintf('Node name <%s> could not be found in the node list', nodes{k}));
+        assert(numel(lMatchIndex)==1, 'Node name was found multiple times');
+        T(k,:) = Tmatrix(lMatchIndex,lParams.index);
+      endfor
+    % Interpolate temperature based on times specified by the user
+    else
+      T = [];
+    endif
+  else % If lParams.merge
+    T = {};
+    for i=1:numel(nodes)
+      T = [T; HT_Result_GetNodeTemperature(nodes{i}, Tmatrix, Tnodes, ...
+                  'index', lParams.index, ...
+                  'time', lParams.time, ...
+                  'timevector', lParams.timevector, ...
+                  'merge', true)];
     endfor
-  % Interpolate temperature based on times specified by the user
-  else
-    T = [];
   endif
-
 
 endfunction
 

@@ -80,10 +80,10 @@ function [T] = HT_Result_GetFaceTemperature(face, Tmatrix, Tnodes, varargin)
   T = cell(numel(face), 1);
   S = NA(numel(face), 1); % Store the total area of each faces
 
-  if strcmpi(lParams.operation, 'average'), S = HT_Face_GetAbsoluteData(face, 'nodesArea'); endif;
-
   for i=1:numel(T)
-    Tvec = HT_Result_GetNodeTemperature(Int_GetObject(face(i)).nodes, ...
+    lFaceObject = Int_GetObject(face(i));
+
+    Tvec = HT_Result_GetNodeTemperature(lFaceObject.nodes, ...
                                         Tmatrix, ...
                                         Tnodes, ...
                                         'index', lExtractNodeParams.index, ...
@@ -91,7 +91,7 @@ function [T] = HT_Result_GetFaceTemperature(face, Tmatrix, Tnodes, varargin)
                                         'timevector', lExtractNodeParams.timevector);
 
     if strcmpi(lParams.operation, 'average')
-      Snodes = HT_Face_GetAbsoluteData(Int_GetObject(face(i)), 'nodesArea');
+      Snodes = HT_Face_GetAbsoluteData(lFaceObject, 'nodesArea');
       S(i) = sum(Snodes);
       T{i} = (Snodes' / S(i)) * Tvec;
     elseif strcmpi(lParams.operation, 'array')

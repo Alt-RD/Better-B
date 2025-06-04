@@ -132,7 +132,11 @@ function [Ys] = HT_Face_GetAbsoluteData(Fs, params)
     elseif strcmpi(params, 'xgrid')
       % xgrid returns a matrix (3 x (nNodes+1)) containing the node boundaries
       % in global coordinate system
-      lUGrid = [0; unique(F.dims(:,2))];
+      if isempty(F.dims) % If no mesh is defined,
+        lUGrid = [0; 1];
+      else
+        lUGrid = [0; unique(F.dims(:,2))];
+      endif
       % Make sure there is no numeric error to produce very small nodes
       % In that cases, some fixes will be necessary
       tmp = min(lUGrid(2:end)-lUGrid(1:(end-1)));
@@ -144,7 +148,11 @@ function [Ys] = HT_Face_GetAbsoluteData(Fs, params)
     elseif strcmpi(params, 'ygrid')
       % xgrid returns a matrix (3 x (nNodes+1)) containing the node boundaries
       % in global coordinate system
-      lVGrid = [0; unique(F.dims(:,4))];
+      if isempty(F.dims)
+        lVGrid = [0; 1];
+      else
+        lVGrid = [0; unique(F.dims(:,4))];
+      endif
       % Make sure there is no numeric error to produce very small nodes
       % In that cases, some fixes will be necessary
       tmp = min(Y(2:end)-Y(1:(end-1)));

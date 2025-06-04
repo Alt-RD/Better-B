@@ -77,7 +77,7 @@ function v = HT_Material_GetEmissivity(mat, wavelength, varargin)
     lLightAngle = lLightAngle(:)';
 
     if strcmpi(mat.epsModel, 'constant')
-      v = repmat(v, 1, numel(lLightAngle);
+      v = repmat(v, 1, numel(lLightAngle));
     elseif strcmpi(mat.epsModel, 'power')
       v = v * (1 - lLightAngle.^mat.epsParameters);
     elseif strcmpi(mat.epsModel, 'cosine')
