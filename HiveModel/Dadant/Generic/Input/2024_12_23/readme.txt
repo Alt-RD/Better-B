@@ -1,0 +1,1 @@
+The zip file "2024_12_23_TestHive_Bordeaux" contains measurement data recorded in an experimental apiary near Bordeaux, France in december 2024. Data are split in two csv files, one for the environment data, the other for the hive.
