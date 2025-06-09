@@ -70,6 +70,7 @@
 %> @retval F return value for the first output variable
 %======================================================================
 function F = HT_Face_Init(varargin)
+  global HT_VAR_EPSILON_POS;
   assert(numel(varargin) >= 1, 'At least one parameter is required to init face');
 
   lStructMode = isstruct(varargin{1}); % iscell(varargin{1}) ||;
@@ -100,10 +101,12 @@ function F = HT_Face_Init(varargin)
 
     assert(numel(prop) == numel(value), 'Invalid input parameters');
 
+##    round([lPos1; lPos2] ./ HT_VAR_EPSILON_POS) * HT_VAR_EPSILON_POS
+
     nProp = numel(prop);
     for i=1:nProp
       if strcmpi(prop{i}, "size")
-        faceSize = value{i};
+        faceSize = HT_Round(value{i}, HT_VAR_EPSILON_POS);
       elseif strcmpi(prop{i}, "nodes")
         nodes = value{i};
       elseif strcmpi(prop{i}, "position")
@@ -121,7 +124,7 @@ function F = HT_Face_Init(varargin)
       elseif strcmpi(prop{i}, "norm")
         norm = value{i};
       elseif strcmpi(prop{i}, "globalPosition")
-        globalPosition = value{i};
+        globalPosition = HT_Round(value{i}, HT_VAR_EPSILON_POS);
       elseif strcmpi(prop{i}, "r")
         resistance = value{i};
       elseif strcmpi(prop{i}, "model")
@@ -228,11 +231,17 @@ function F = HT_Face_Init(varargin)
     error('Not implemented yet');
   endif
 
+  if ~iscell(nodes) || all(cellfun(@(v) ischar(v), nodes))
+    % If all elements of nodes are char, convert it to a single element cell
+    % to prevent "struct initialisation" to build Nnodes faces.
+    nodes = { nodes };
+  endif
+
   F = struct( '__type__', 'face', ...
               'name', name, ...
               'size', faceSize, ...
               'globalPosition', globalPosition, ...
-              'nodes', { nodes }, ...
+              'nodes', nodes, ...
               'pos', pos, ...
               'dims', dims, ...
               'edges', edges, ...

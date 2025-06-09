@@ -8,7 +8,7 @@
 %  Agency (REA), SERI or UKRI. Neither the European Union nor the granting
 %  authorities can be held responsible for them.
 %
-%  Copyright (c) 2022-2025 AltRD: Emmanuel Ruffio
+%  Copyright (c) 2025 AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@alt-rd.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -24,12 +24,11 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function v = HT_Material_GetRhoC(mat)
-  assert(HT_CheckType(mat, "material"), 'Invalid material object');
-##  assert(isfield(mat, 'rho') && isfield(mat, 'cp'));
-  if iscell(mat)
-    v = cellfun(@(v) v.rho * v.cp, mat);
-  else
-    v = arrayfun(@(v) v.rho * v.cp, mat);
+function value = HT_Round(value, precision)
+  if iscell(value)
+    assert(all(cellfun(@(v) isnumeric(v), value)));
+    value = cellfun(@(v) round(v ./ precision) * precision, value, 'uniformoutput', false);
+  elseif isnumeric(value)
+    value = round(value ./ precision) .* precision;
   endif
 endfunction

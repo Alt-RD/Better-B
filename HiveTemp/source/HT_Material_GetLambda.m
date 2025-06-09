@@ -31,14 +31,27 @@ function v = HT_Material_GetLambda(mat, dir)
   if nargin < 2, dir = []; endif
 
   if isempty(dir)
-    if isscalar(mat.lambda)
-      v = repmat(mat.lambda, 3, 1);
-    else
-      v = mat.lambda;
-    endif
+    v = NA(3, numel(mat));
+
+    for i=1:numel(mat)
+      if isscalar(mat(i).lambda)
+        v(:,i) = repmat(mat(i).lambda, 3, 1);
+      else
+        v(:,i) = mat(i).lambda;
+      endif
+    endfor
   else
     assert((dir >= 1) && (dir <= 3), 'Invalid direction');
-    assert(dir <= numel(mat.lambda), 'Invalid material conductivity');
-    v = mat.lambda(dir);
+##    assert(dir <= numel(mat.lambda), 'Invalid material conductivity');
+##    v = mat.lambda(dir);
+
+    v = NA(numel(mat), 1);
+    for i=1:numel(mat)
+      if isscalar(mat(i).lambda)
+        v(i) = mat(i).lambda;
+      else
+        v(i) = mat(i).lambda(dir);
+      endif
+    endfor
   endif
 endfunction

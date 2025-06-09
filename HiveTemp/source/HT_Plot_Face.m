@@ -146,6 +146,7 @@ function hvec = HT_Plot_Face(varargin)
 ##          C = repmat(face.material.color(:)', nf, 1);
         else
           assert(~isempty(face.materialIndex), 'Invalid field <materialIndex>');
+          assert(isstruct(face.material), 'Invalid field <material>. Must be struct array');
           C = cell2mat(arrayfun(@(mat) mat.color(:)', face.material(:), 'Uniformoutput', false));
           C = C(face.materialIndex,:);
         endif

@@ -365,8 +365,8 @@ function M = Int_ConnectFaces_RectRect(M, F1, uv1, F2, uv2, params, options)
   lv1 = (uv1chk(4)-uv1chk(3));
   lu2 = (uv2chk(2)-uv2chk(1));
   lv2 = (uv2chk(4)-uv2chk(3));
-  assert(abs(lu1 - lu2) < 1E-10, sprintf('Wrong faces dimensions. u length = %f and %f', lu1, lu2));
-  assert(abs(lv1 - lv2) < 1E-10, sprintf('Wrong faces dimensions. v length = %f and %f', lv1, lv2));
+  assert(abs(lu1 - lu2) < HT_VAR_EPSILON_POS, sprintf('Wrong faces dimensions. u length = %f and %f. Difference is %e', lu1, lu2, abs(lu1 - lu2)));
+  assert(abs(lv1 - lv2) < HT_VAR_EPSILON_POS, sprintf('Wrong faces dimensions. v length = %f and %f. Difference is %e', lv1, lv2, abs(lv1 - lv2)));
   lThreshold = 1E-10*lu1*lv1; % Remove conductance attached to surface area smaller than this
   clear uv1chk uv2chk lu1 lv1 lu2 lv2;
 

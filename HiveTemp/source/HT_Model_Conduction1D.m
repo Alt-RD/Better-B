@@ -23,9 +23,8 @@
 % .name = [string] nom du model
 % .params = [struct] data structure containing following fields
 %         .length = [1xNlayer] length of each layer along the x direction
-%         .rhoC   = [1xNlayer] volumetric thermal capacity of each layer
-%         .lambda = [1xNlayer] thermal conductivity of each layer
-%         .Rc     = [1x(Nlayer-1)] thermal contact resistance
+%         .material  = struct array/cell array of {material}
+%         .rc     = [1x(Nlayer-1)] thermal contact resistance
 %         .dim    = 2x1 wall dimension along y and z directions
 %         .axis   = [3x3]=[X,Y,Z] axis of local coordinate system. It defines
 %                   the wall orientation
@@ -114,24 +113,24 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
   endif
 
   % Set default parameter values
-  lParams = CheckField(lParams, 'material',       [],                 {"exist", @(v) isstruct(v) || iscell(v) });
-  lParams = CheckField(lParams, 'n',              [],                 {"exist", @(v) isfloat(v) || iscell(v) });
-  lParams = CheckField(lParams, 'u',              [],                 @(v) isfloat(v) || iscell(v));
-  lParams = CheckField(lParams, 'T0',             NaN,                @(v) isfloat(v) || iscell(v));
+  lParams = CheckField(lParams, 'material',       [],                 {"exist", @(v) isstruct(v) && iscolumn(v) });
+  lParams = CheckField(lParams, 'n',              [],                 {"exist", @(v) (isfloat(v) || iscell(v)) && iscolumn(v) });
+  lParams = CheckField(lParams, 'u',              [],                 @(v) (isfloat(v) || iscell(v)) && iscolumn(v));
+  lParams = CheckField(lParams, 'T0',             NaN,                @(v) (isfloat(v) || iscell(v)) && iscolumn(v));
   lParams = CheckField(lParams, 'axis',           [],                 @(v) isfloat(v) && all(size(v) == [3,3]));
   lParams = CheckField(lParams, 'globalPosition', [],                 @(v) isfloat(v) && (numel(v) == 3));
-  lParams = CheckField(lParams, 'length',         [],                 {"exist", @(v) isscalar(v) || iscell(v) });
+  lParams = CheckField(lParams, 'length',         [],                 {"exist", @(v) (isscalar(v) || iscell(v)) && iscolumn(v) });
   lParams = CheckField(lParams, 'dim',            [],                 @(v) isfloat(v) || (numel(v) == 2) );
   lParams = CheckField(lParams, 'base',           [],                 @(v) HT_CheckType(v, 'face') );
   lParams = CheckField(lParams, 'nodeNameModel',  strcat(strrep(name, ' ', '_'), '.n%d'),       @(v) ischar(v) && any(numel(strfind(options.nodeNameModel, '%d')) == [ 1 2 ] ));
   lParams = CheckField(lParams, 'boundaryNames',  { {'',''} },        @(v) iscell(v));
-  lParams = CheckField(lParams, 'gridType',       'ff',               @(v) ischar(v) || iscell(v));
+  lParams = CheckField(lParams, 'gridType',       'ff',               @(v) ischar(v) || (iscell(v) && iscolumn(v)));
   lParams = CheckField(lParams, 'mergeFaces',     false,              @(v) islogical(v));
 
   % Build a structure array of each layer
   % If an argument has an invalid size, Octave will raise an error here
   lLayerData = struct(
-    'material', lParams.material, ...
+    'material', arrayfun(@(v) v, lParams.material, 'UniformOutput', false), ...
     'n', lParams.n, ...
     'u', lParams.u, ...     % Position of node boundaries
     'upos', [], ...         % Position of nodes
@@ -175,7 +174,7 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
     if (layer.gridType(1) == 'h'), layer.upos(1) = 0; endif
     if (layer.gridType(2) == 'h'), layer.upos(end) = 1; endif
 
-    if isscalar(layer.T0), layer.T0 = repmat(layer.T0, layer.n, 1); endif
+    if isscalar(layer.T0), layer.T0 = repmat(layer.T0, 1, layer.n); endif
 
     lLayerData(i) = layer;
   endfor
@@ -222,8 +221,8 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
   lNodeCount = 0;
   for i=1:nLayer
     layer = lLayerData(i);
-    layer.C = (lArea * layer.length * HT_Material_GetRhoC(layer.material)) * layer.usize;
-    layer.nodes = cell(layer.n,1);
+    layer.C = (lArea * layer.length * HT_Material_GetRhoC(layer.material)) * layer.usize';
+    layer.nodes = cell(1, layer.n);
 
     for k=1:layer.n
       layer.nodes{k} = NodeNameFunc(i, k, lNodeCount+k);
@@ -253,10 +252,11 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
 
   % Build the model
   M = HT_Model_Init(lModelTypeName, name, lParams);
+##  M.nodes = HT_CellUnwrap({lLayerData.nodes}); [lLayerData](:);   % Extract and merge all nodes from all layers
   M.nodes = [lLayerData.nodes](:);   % Extract and merge all nodes from all layers
   M.G = blkdiag(lLayerData.G);    % Extract and merge all conductance matrix
-  M.C = [lLayerData.C];
-  M.T0 = [lLayerData.T0];
+  M.C = [lLayerData.C](:);
+  M.T0 = [lLayerData.T0](:);
   M.globalPosition = lParams.globalPosition;
   M.axis = lParams.axis;
 
@@ -366,8 +366,12 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
       faces(FaceZP).dims = [P1            , P2, ...
                         zeros(nTotal, 1)  , ones(nTotal, 1)];
     else
-      lLengthVec = arrayfun(@(v) v.length, lLayerData);
+##      lLengthVec = arrayfun(@(v) v.length, lLayerData);
+      lLengthVec = [lLayerData.length](:);
       lLengthVec_cumsum = cumsum([0; lLengthVec(1:(end-1))]);
+      lNVec = arrayfun(@(v) v.n, lLayerData);
+      lNCumSumVec = cumsum([0; lNVec]);
+##      lMaterialIndexList = repelem((1:nLayer)', lNVec);
       faces = [];
 
       for i=1:nLayer
@@ -402,18 +406,33 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
                                       ly/2/lLambda(Y);...
                                       lz/2/lLambda(Z);...
                                       lz/2/lLambda(Z)},...
-                              'material', lParams.material, ...
+                              'material', {lParams.material(i); ... Only one material per face here
+                                           lParams.material(i);
+                                           lParams.material(i); ...
+                                           lParams.material(i); ...
+                                           lParams.material(i); ...
+                                           lParams.material(i)}, ...
+                              'nodes', {M.nodes(lNCumSumVec(i)+1); ...
+                                        M.nodes(lNCumSumVec(i)+layer.n);
+                                        M.nodes(lNCumSumVec(i)+(1:layer.n)); ...
+                                        M.nodes(lNCumSumVec(i)+(1:layer.n)); ...
+                                        M.nodes(lNCumSumVec(i)+(1:layer.n)); ...
+                                        M.nodes(lNCumSumVec(i)+(1:layer.n))}, ...
+                              'materialIndex', {1;
+                                                1;
+                                                ones(layer.n, 1);
+                                                ones(layer.n, 1);
+                                                ones(layer.n, 1);
+                                                ones(layer.n, 1)}, ...
                               'model', name);
 
         % Pour chaque face, les axes sont les mêmes que le repère principal 3D
         % L'ordre est tel que les axes forment toujours un repère direct.
         % Ex: Sur la face YP, le repère 2D est (u,v)=(z3D,x3D)
         % Ex: Sur la face ZP, le repère 2D est (u,v)=(x3D,y3D)
-        f(FaceXM).nodes = layer.nodes(1);
         f(FaceXM).pos = [0.5  0.5]; % Axis y x
         f(FaceXM).dims = [0 1 0 1]; ...
 
-        f(FaceXP).nodes = layer.nodes(end);
         f(FaceXP).pos = [0.5  0.5]; % Axis x y
         f(FaceXP).dims = [0 1 0 1]; ...
 
@@ -422,22 +441,18 @@ function [M faces nodes] = HT_Model_Conduction1D(name, varargin)
         P1 = layer.u(1:(end-1));
         P2 = layer.u(2:end);
 
-        f(FaceYM).nodes = layer.nodes;
         f(FaceYM).pos = [P repmat(0.5, layer.n,1)]; % u,v = Axis x z
         f(FaceYM).dims = [P1 , P2 , ...
                           zeros(layer.n, 1) , ones(layer.n, 1)];
 
-        f(FaceYP).nodes = layer.nodes;
         f(FaceYP).pos = [repmat(0.5, layer.n,1) P]; % u,v = Axis z x
         f(FaceYP).dims = [zeros(layer.n, 1)  , ones(layer.n, 1) ...
                           P1            , P2];
 
-        f(FaceZM).nodes = layer.nodes;
         f(FaceZM).pos = [repmat(0.5, layer.n,1) P]; % u,v = y,x
         f(FaceZM).dims = [zeros(layer.n, 1)  ,  ones(layer.n, 1) , ...
                           P1            ,  P2];
 
-        f(FaceZP).nodes = layer.nodes;
         f(FaceZP).pos = [P repmat(0.5, layer.n,1)]; % u,v = x,y
         f(FaceZP).dims = [P1            , P2, ...
                           zeros(layer.n, 1)  , ones(layer.n, 1)];

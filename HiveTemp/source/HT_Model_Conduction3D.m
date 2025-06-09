@@ -231,7 +231,7 @@ function [M, faces] = HT_Model_Conduction3D(name, params, options)
   params = HT_CheckField(params, 'Rc', zeros(Nlayer-1,1), @(v) isfloat(v) && all(v >= 0) && (any(numel(v) == [1 Nlayer-1])));
   params = HT_CheckField(params, 'T0', NaN, @(v) (numel(v) == 1) || (numel(v) == nNodes));
 
-  params = HT_CheckField(params, 'axis', eye(3),   {@(v) all(size(v) == [3 3]) && all(vecnorm(v, Inf, 1) == 1.0)});
+  params = HT_CheckField(params, 'axis', eye(3),   {@(v) all(size(v) == [3 3]) && all(vecnorm(v, 2, 1) == 1.0)});
   assert(norm(cross(params.axis(:,1), params.axis(:,2)) - params.axis(:,3)) < 1E-15, 'Invalid <axis>');
   params = HT_CheckField(params, 'globalPosition', zeros(3,1),   {@(v) (numel(v) == 3) && all(~isna(v))});
 
@@ -344,6 +344,7 @@ function [M, faces] = HT_Model_Conduction3D(name, params, options)
             Gmat(iNode, iNode+nxy) += Gz/dzVec(klayer+k);
             Gmat(iNode, iNode) -= Gz/dzVec(klayer+k);
           elseif m < Nlayer % Connect with next layer
+            Sz = xSize(i)*ySize(j);
             Gzp = params.lambda(3, m+1) * Sz / zSize(ktotal+1);
             Gzc = lambdaz * Sz / zSize(ktotal);
             lGz = 1/(0.5/Gzc + 0.5/Gzp);
@@ -355,6 +356,7 @@ function [M, faces] = HT_Model_Conduction3D(name, params, options)
             Gmat(iNode, iNode-nxy) += Gz/dzVec(klayer+k-1);
             Gmat(iNode, iNode) -= Gz/dzVec(klayer+k-1);
           elseif m > 1 % Connect with previous layer
+            Sz = xSize(i)*ySize(j);
             Gzp = params.lambda(3, m-1) * Sz / zSize(ktotal-1);
             Gzc = lambdaz * Sz / zSize(ktotal);
             lGz = 1/(0.5/Gzc + 0.5/Gzp);
@@ -412,7 +414,24 @@ function [M, faces] = HT_Model_Conduction3D(name, params, options)
                                         params.axis(:,2); ...
                                         -params.axis(:,3); ...
                                         params.axis(:,3) }, ...
-                               'material', params.material, ...
+                               'nodes', { M.nodes( 1 + reshape((0:(ny*nz-1))*nx, ny, nz)'(:) ); ...
+                                          M.nodes( reshape((1:(ny*nz))*nx, ny, nz)(:) ); ...
+                                          M.nodes( repmat((1:nx)', 1, nz)(:) + repmat((0:(nz-1))*nxy, nx, 1)(:) ); ...
+                                          M.nodes( repmat((nxy-nx+1):nxy, nz, 1)(:) + repmat((0:(nz-1))'*nxy, nx, 1) ); ...
+                                          M.nodes( reshape(1:nxy, nx, ny)'(:) );...
+                                          M.nodes( (nz-1)*nxy + (1:nxy) )}, ...
+                               'material', { params.material; ...
+                                             params.material; ...
+                                             params.material; ...
+                                             params.material; ...
+                                             params.material(1); ...
+                                             params.material(end)}, ...
+                               'materialIndex', { repelem((1:Nlayer)', nzVec*ny) ; ...
+                                                  repelem((1:Nlayer)', nzVec*ny) ; ...
+                                                  repelem((1:Nlayer)', nzVec*nx) ; ...
+                                                  repelem((1:Nlayer)', nzVec*nx) ; ...
+                                                  ones(nxy, 1) ; ...
+                                                  ones(nxy, 1)}, ...
                                'model', name...
                                        );
 
@@ -422,38 +441,32 @@ function [M, faces] = HT_Model_Conduction3D(name, params, options)
       % Ex: Sur la face ZP, le repère 2D est (u,v)=(x3D,y3D)
 
       % Make sure nodes are following axis order (y first, then x)
-      faces(FaceZM).nodes = M.nodes( reshape(1:nxy, nx, ny)'(:) );
       faces(FaceZM).pos =  [repmat(yPos, nx, 1)   repelem(xPos, ny, 1)]; % Axis y x
       faces(FaceZM).dims = [repmat(yDim, nx, 1)   repelem(xDim, ny, 1)];
       if params.zGridType(1) != 'h', faces(FaceZM).r = 0.5*zSize(1)/params.lambda(3,1); endif;
 
-      faces(FaceZP).nodes = M.nodes( (nz-1)*nxy + (1:nxy) );
       faces(FaceZP).pos =  [repmat(xPos, ny, 1)   repelem(yPos, nx, 1)]; % Axis x y
       faces(FaceZP).dims = [repmat(xDim, ny, 1)   repelem(yDim, nx, 1)];
       if params.zGridType(2) != 'h', faces(FaceZP).r = 0.5*zSize(end)/params.lambda(3,end); endif;
 
-      faces(FaceXM).nodes = M.nodes( 1 + reshape((0:(ny*nz-1))*nx, ny, nz)'(:) );
       faces(FaceXM).pos =  [repmat(zPos, ny, 1)    repelem(yPos, nz, 1)]; % z, y
       faces(FaceXM).dims = [repmat(zDim, ny, 1)    repelem(yDim, nz, 1)];
       if params.xGridType(1) != 'h'
         faces(FaceXM).r = 0.5*xSize(1)./ repmat(lambdaxVec, ny, 1); % .* repmat(zSize, ny, 1) .* repelem(ySize, nz, 1) );
       endif;
 
-      faces(FaceXP).nodes = M.nodes( reshape((1:(ny*nz))*nx, ny, nz)(:) );
       faces(FaceXP).pos =  [repmat(yPos, nz, 1)     repelem(zPos, ny, 1)];  % Axis y z
       faces(FaceXP).dims = [repmat(yDim, nz, 1)     repelem(zDim, ny, 1)];
       if params.xGridType(2) != 'h'
         faces(FaceXP).r = 0.5*xSize(end)./ repelem(lambdaxVec, ny, 1); % .* repelem(zSize, ny, 1) .* repmat(ySize, nz, 1) );
       endif;
 
-      faces(FaceYM).nodes = M.nodes( repmat((1:nx)', 1, nz)(:) + repmat((0:(nz-1))*nxy, nx, 1)(:) );
       faces(FaceYM).pos =  [repmat(xPos, nz, 1)  repelem(zPos, nx, 1)]; % Axis x z
       faces(FaceYM).dims = [repmat(xDim, nz, 1)  repelem(zDim, nx, 1)];
       if params.yGridType(1) != 'h'
         faces(FaceYM).r = 0.5*ySize(1)./ repelem(lambdayVec, nx, 1); %  .* repmat(xSize, nz, 1) .* repelem(zSize, nx, 1) );
       endif;
 
-      faces(FaceYP).nodes = M.nodes( repmat((nxy-nx+1):nxy, nz, 1)(:) + repmat((0:(nz-1))'*nxy, nx, 1) );
       faces(FaceYP).pos =  [repmat(zPos, nx, 1)  repelem(xPos, nz, 1)];    % Axis z x
       faces(FaceYP).dims = [repmat(zDim, nx, 1)  repelem(xDim, nz, 1)];
       if params.yGridType(2) != 'h'
@@ -507,7 +520,7 @@ function [xPos xSize xDim, nx] = Int_InitMeshSize(xGrid, nx, Lx, xtype, vDir, vP
       xPos = [xPos ; lxPos];
     endfor
 
-    assert(abs(xPos(end)-1+0.5*ldx*(xtype(1)!='h')) < 1E-12);
+    assert(abs(xPos(end)-1+0.5*ldx*(xtype(2)!='h')) < 1E-12);
     assert(abs(sum(xSize)-1) < 1E-12);
     clear ldx lxSize lxPos;
   elseif iscell(xGrid) && all(cellfun(@(v) isnumeric(v), xGrid))

@@ -89,6 +89,7 @@ addpath(strcat(HT_VAR_LIB_PATH, '/Tools'));
 % Load miscellaneous package for functions "clip", "normc"
 pkg load miscellaneous;
 pkg load geometry;      % boundingBox
+pkg load linear-algebra; % rotv
 
 % Import constant symbols that could be useful to design a thermal model
 HT_ImportConstants();

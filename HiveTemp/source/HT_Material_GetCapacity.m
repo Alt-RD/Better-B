@@ -24,12 +24,7 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function v = HT_Material_GetRhoC(mat)
+function v = HT_Material_GetCapacity(mat)
   assert(HT_CheckType(mat, "material"), 'Invalid material object');
-##  assert(isfield(mat, 'rho') && isfield(mat, 'cp'));
-  if iscell(mat)
-    v = cellfun(@(v) v.rho * v.cp, mat);
-  else
-    v = arrayfun(@(v) v.rho * v.cp, mat);
-  endif
+  v = mat.cp;
 endfunction
