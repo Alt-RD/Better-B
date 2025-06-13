@@ -24,7 +24,20 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function mat = HT_Material_SetLambda(mat, lambda)
+function mat = HT_Material_SetLambda(mat, propName, propValue)
   assert(HT_CheckType(mat, "material"), 'Invalid material object');
-  mat.lambda = lambda;
+  if isnumeric(propName)
+    assert(nargin < 3);
+    mat.lambda = propName;
+  elseif ischar(propName)
+    if strcmpi('multiply', propName)
+      mat.lambda *= propValue;
+    elseif strcmpi('add', propName)
+      mat.lambda += propValue;
+    else
+      error('Invalid property name');
+    endif
+  else
+    error('Invalid type');
+  endif
 endfunction

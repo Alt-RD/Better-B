@@ -25,9 +25,9 @@
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
 %
-% Returns temperatures related to a face
+% Returns temperature of a volume
 % Input arguments:
-% 1) <face object> = [object or array of type Face]
+% 1) <volume object> = [object or array of type Face]
 % 2) <Tmatrix> = [matrix dim Nnodes x Ntimes]
 % 3) <Tnodes> = [cell array of string dim Nnodes]
 % 4) <options>
@@ -38,23 +38,26 @@
 %             of interpolation. If a component could not be found in <.timeVector>
 %             it is interpolated.
 %     .timeVector = [vector] Column vector containing the time steps used by the
-%             simulation
+%             simulation, that correspond to the matrix columns of <Tmatrix>
 %     .operation = ["average"], "array"
-%     .merge = [logical] [false] if true and if face is an array, all
+%     .merge = [logical] [false] if true and if volume is an array, all
 %               data are merged into a single value (average of average for
 %               "average" operation) or array.
 %
 %
 % Output arguments:
 % Temperature matrix T (dim nNodes x nt)
-function [T] = HT_Result_GetFaceTemperature(face, Tmatrix, Tnodes, varargin)
+function [T infos] = HT_Result_GetVolumeTemperature(volume, Tmatrix, Tnodes, varargin)
   HT_ImportConstants();
 
   assert(nargin >= 3, 'Missing input arguments');
-  assert(HT_CheckType(face, 'face') || ...
-          (iscell(face) && all(cellfun(RT_CheckType(v, 'face'), face))) || ...
-          (isstruct(face) && all(arrayfun(RT_CheckType(v, 'face'), face))), 'Invalid face object or face array');
+  assert(HT_CheckType(volume, 'volume') || ...
+          (iscell(volume) && all(cellfun(RT_CheckType(v, 'volume'), volume))) || ...
+          (isstruct(volume) && all(arrayfun(RT_CheckType(v, 'volume'), volume))), 'Invalid volume object');
   assert(isnumeric(Tmatrix) && (rows(Tmatrix) == numel(Tnodes)), 'Invalid temperature matrix or node list');
+
+  T = [];
+  infos = struct('V', []);
 
   prop = varargin(1:2:end);
   value = varargin(2:2:end);
@@ -84,32 +87,47 @@ function [T] = HT_Result_GetFaceTemperature(face, Tmatrix, Tnodes, varargin)
     if any(strcmpi(prop{i}, lCopyField)), lExtractNodeParams = setfield(lExtractNodeParams, prop{i}, value{i}); endif;
   endfor
 
-  % Retrieve the temperature of each nodes for each faces
-  T = cell(numel(face), 1);
-  S = NA(numel(face), 1); % Store the total area of each faces
+  % Retrieve the temperature of each nodes for each volume
+  T = cell(numel(volume), 1);
+  V = NA(numel(volume), 1); % Store the total area of each volume
 
   for i=1:numel(T)
-    lFaceObject = Int_GetObject(face(i));
+    if iscell(volume) && iscell(volume{i})
+      [T lInfos] = HT_Result_GetNodeTemperature(volume{i}, ...
+                                                Tmatrix, ...
+                                                Tnodes, ...
+                                                'index', lExtractNodeParams.index, ...
+                                                'time', lExtractNodeParams.time, ...
+                                                'timevector', lExtractNodeParams.timevector, ...
+                                                'operation', 'average');
+      V(i) = lInfos.V;
+      T{i} = T;
+    else
+      lVolumeObject = Int_GetObject(volume(i));
 
-    Tvec = HT_Result_GetNodeTemperature(lFaceObject.nodes, ...
-                                        Tmatrix, ...
-                                        Tnodes, ...
-                                        'index', lExtractNodeParams.index, ...
-                                        'time', lExtractNodeParams.time, ...
-                                        'timevector', lExtractNodeParams.timevector);
+      Tvec = HT_Result_GetNodeTemperature(lVolumeObject.nodes, ...
+                                          Tmatrix, ...
+                                          Tnodes, ...
+                                          'index', lExtractNodeParams.index, ...
+                                          'time', lExtractNodeParams.time, ...
+                                          'timevector', lExtractNodeParams.timevector);
 
-    Snodes = HT_Face_GetAbsoluteData(lFaceObject, 'nodesArea');
-    S(i) = sum(Snodes);
-    T{i} = sum((Snodes' / S(i)) * Tvec, 1);
+      V(i) = sum(lVolumeObject.nodesVolume);
+      T{i} = sum((lVolumeObject.nodesVolume / V(i)) .* Tvec, 1);
+    endif
+
   endfor
 
   if lParams.merge
     if strcmpi(lParams.operation, 'array')
       T = cell2mat(T(:));
+      infos.V = V;
     elseif strcmpi(lParams.operation, 'average')
+      infos.V = sum(V);
+
       if numel(T) > 1
         T = cell2mat(T(:));
-        T = sum(T .* S, 1) / sum(S);
+        T = sum((T .* V) / infos.V, 1);
       else
         T = T{1};
       endif

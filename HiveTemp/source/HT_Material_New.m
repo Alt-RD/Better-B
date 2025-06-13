@@ -24,11 +24,18 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
+## Three different model for angle dependent emissivity
+##  The <angle> is the normalized angle between the incoming light and the
+##  surface normal. <angle> (in [0;1]) is then the angle divided by pi/2.
+##  'constant':
+##  'power': eps(angle) = eps * (1 - angle.^mat.epsParameters);
+##  'cosine': eps(angle) = eps * cos(angle.^mat.epsParameters * pi/2);
+##
 function M = HT_Material_New(varargin)
   assert(numel(varargin) > 0);
   assert(ischar(varargin{1}), 'Invalid argument. Should be string');
 
-  lParamList = {'name', 'rho', 'cp', 'eps', 'lambda', 'color'};
+  lParamList = {'name', 'rho', 'cp', 'eps', 'epsParameters', 'specularRatio', 'lambda', 'color'};
   lLoadFromName = ~any(strcmpi(varargin{1}, lParamList));
 
   if lLoadFromName   % Material name specified
@@ -53,6 +60,7 @@ function M = HT_Material_New(varargin)
   M = HT_CheckField(M, 'eps',               1.0);
   M = HT_CheckField(M, 'epsModel',          'constant', {@(v) any(strcmpi(v, {'constant', 'power', 'cosine'}))});
   M = HT_CheckField(M, 'epsParameters',     1.0); % This field holds the parameters used by the epsModel
+  M = HT_CheckField(M, 'specularRatio',     0.0); % Fraction of reflected radiation that is specular
   % Mandatory fields
   M = HT_CheckField(M, 'rho',   0,          {'exist'});
   M = HT_CheckField(M, 'cp',    0,          {'exist'});
@@ -116,7 +124,7 @@ function M = INT_GetFromName(name)
                           'rho', 1200, ...
                           'cp', 1250 , ...
                           'lambda', 0.7, ...
-                          'eps', [HT_WAVELENGTH_VISIBLE  0.5;
+                          'eps', [HT_WAVELENGTH_VISIBLE  0.5; ... % Reference needed
                                   HT_WAVELENGTH_IR_MED   0.95]);
   elseif  strcmpi(name, 'wet ground')
     M = HT_Material_New(  'name', name, ...
@@ -124,7 +132,7 @@ function M = INT_GetFromName(name)
                           'rho', 1700, ...
                           'cp', 1250 , ...
                           'lambda', 1.7, ...
-                          'eps', [HT_WAVELENGTH_VISIBLE  0.5;
+                          'eps', [HT_WAVELENGTH_VISIBLE  0.7; ... % Reference needed
                                   HT_WAVELENGTH_IR_MED   0.95]);
   elseif  strcmpi(name, 'granit') % Wikipedia
     M = HT_Material_New(  'name', name, ...

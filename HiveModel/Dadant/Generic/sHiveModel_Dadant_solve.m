@@ -34,30 +34,7 @@
 % See Model_Dadant_Schemas.pdf
 % ========================================================================
 
-clear variables;
-
-% Specify the main directory of HiveTemp library (relative or absolute)
-HT_VAR_LIB_PATH = './../../../HiveTemp/source/';
-addpath(make_absolute_filename(HT_VAR_LIB_PATH));
-
-% Init the library
-HT_Init();
-
-% ========================================================================
-%                              PARAMETERS
-% ========================================================================
-sHiveModel_Dadant_setupParams();
-
-% ========================================================================
-%                            HIVE THERMAL MODEL
-% ========================================================================
-sHiveModel_Dadant_setupModel();
-
-% ========================================================================
-%                               COMMANDS
-% ========================================================================
-assert(isfile(strcat(lCommand.scriptfile, '.m')), 'The specified file for command is not valid');
-eval(strcat(lCommand.scriptfile, ';'));
+assert(exist('lCmd', 'var') == 1, 'No command structure found. Command script must be executed first');
 
 % ========================================================================
 %                               RESOLUTION
@@ -77,9 +54,6 @@ t = lComputation.startTime + (0:(lComputation.nt-1)) * lComputation.timeStep;
                 'verbose', lOptions.verbose,                ...
                 'unit', 'degres',                           ... % Warns the function that all temperature are expressed in degC.
                 'info', 'default'));
-
-
-return;
 
 
 % ============================== Model resolution ==============================

@@ -41,18 +41,19 @@ lModel = HT_Model_Init('', 'main');
 % It will be connected to face when necessary along the model building process
 lAirExtNode = HT_Node_Init('nAirExt', 'mode', 'distributed');
 
+
 % ============================== Hivebody 1 2 ==================================
 % Create the hive body with dimension 0.5x0.5x0.5m
-[lMod_HiveBody lMod_HiveBody_faces] = HT_Model_Conduction1D(         ... % Build a two layers 1D heat conduction problem
+[lMod_HiveBody, lMod_HiveBody_faces, ~, lMod_HiveBodyVolumes] = HT_Model_Conduction1D(            ... % Build a two layers 1D heat conduction problem
                           "mHB",                                        ... % Model name of the hive body part 1 and 2
-                          'material', lMatAir,                          ... % Air material for the hive body parts
+                          'material', lHiveMat.bodyAir,                 ... % Air material for the hive body parts
                           'dim', lHiveParams.dimension,                 ... % Dimensions along X and Y direction
                           'axis', [0 0 1; 1 0 0; 0 1 0]',               ... % Local axis (x,y,z)=(Z,X,Y) so that x is oriented towards Z+
-                          'length', {lHiveParams.bodyHeight(1), lHiveParams.bodyHeight(2)},... % Length of the two layers (part1 and part2)
-                          'n', {lMesh.hivebody(1), lMesh.hivebody(2)},  ... % Number of nodes in each layer
+                          'length', {lHiveParams.bodyHeight(1); lHiveParams.bodyHeight(2)},... % Length of the two layers (part1 and part2)
+                          'n', {lMesh.hivebody(1); lMesh.hivebody(2)},  ... % Number of nodes in each layer
                           'mergeFaces', false,...
-                          'gridType', {'hf', 'fh'}, ...
-                          'boundaryNames', {{ 'nHBBot', '' }, {'', 'nHBTop'}}, ...
+                          'gridType', {'hf'; 'fh'}, ...
+                          'boundaryNames', {{ 'nHBBot', '' }; {'', 'nHBTop'}}, ...
                           lOptions);
 % Faces are returned following local axis. Faces are permuted to match global axis
 lMod_HiveBody1_faces = lMod_HiveBody_faces(    [FaceYM; FaceYP; FaceZM; FaceZP; FaceXM; FaceXP]);
@@ -64,7 +65,7 @@ lModel = HT_Model_Merge(lModel, lMod_HiveBody, lOptions);
 
 if lPlotOptions.plotGeometry
 HT_Plot_Face(lMod_HiveBody1_faces, l3DPlotOptions); % Display the geometry
-HT_Plot_Face(lMod_HiveBody2_faces, l3DPlotOptions); % Display the geometry
+##HT_Plot_Face(lMod_HiveBody2_faces, l3DPlotOptions); % Display the geometry
 endif
 
 % ================================= Sidewalls ==================================
@@ -81,6 +82,7 @@ for i=1:4
             'n',        [NA NA lMesh.sidewalls]     ... % NA is used since mesh is extracted from face <base>
             ),...
     lOptions);
+
   lModel = HT_Model_Merge(lModel, lMod_SideWall1, lOptions);
   lMod_SideWall1_facesCell{i} = lMod_SideWall1_faces;
 
@@ -350,6 +352,7 @@ for i=1:4
   lModel = HT_Model_Merge(lModel, lMod_Tmp, lOptions);
 endfor
 
+
 % =================================== Roof =====================================
 lRoofSize = lHiveParams.dimension + 2*lHiveParams.wallThickness + 2*lHiveParams.roofIntExtra;
 lRoofPosition = lHiveParams.globalPosition + ...
@@ -395,6 +398,7 @@ if lPlotOptions.plotGeometry
   HT_Plot_Face(lMod_Roof_faces, setfield(l3DPlotOptions, 'explodeOffset', [0 0 0.1])); %, l3DPlotOptions); % Display the geometry
 endif
 
+
 % Reorder the face to match global axis
 % lMod_Underroof_faces is now a cell array instead of a struct array
 lMod_Roof_faces = HT_Face_Find(lMod_Roof_faces, 'orientation', FaceDIRmat, 'numberCheck', 1, 'returnType', true);
@@ -430,7 +434,9 @@ for i=1:4
   lRoofSide_faces{i} = lMod_RoofSide_faces;
 
   % Plot geometry
-  %HT_Plot_Face(lMod_RoofSide_faces, l3DPlotOptions); %, l3DPlotOptions); % Display the geometry
+  if lPlotOptions.plotGeometry
+    HT_Plot_Face(lMod_RoofSide_faces, l3DPlotOptions); %, l3DPlotOptions); % Display the geometry
+  endif
 
   % Connect the roof side to the roof
   lMod_Tmp = HT_Model_ConnectFaces(...

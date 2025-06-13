@@ -21,40 +21,56 @@
 %                            HIVE THERMAL MODEL
 % ========================================================================
 ##function M = HiveModel_Dadant_setupCommands(hiveOptions, hiveMat, convection, contact, radiation, mesh, plotOptions, plot3dOptions, plotColors, options)
-function [M faces] = HiveModel_Dadant_setupModel(varargin)
+function [M faces volumes] = HiveModel_Dadant_setupModel(varargin)
   HT_ImportConstants();
   assert(nargin > 0);
 
-  prop = varargin(1:2:end);
-  value = varargin(2:2:end);
-  assert(numel(prop) == numel(value), 'Invalid properties');
+  if numel(varargin) == 1 && isstruct(varargin{1})
+    lParams = varargin{1};
 
-  lHiveParams = struct();
-  lHiveMat = struct();
-  lConvection = struct();
-  lContact = struct();
-  lRadiation = struct();
-  lMesh = struct();
-  lPlotOptions = struct();
-  l3DPlotOptions = struct();
-  lPlotColors = struct();
-  lOptions = struct();
-
-  for i=1:numel(prop)
-    if strcmpi(prop{i}, 'hiveParams'), lHiveParams = value{i};
-    elseif strcmpi(prop{i}, 'hiveMaterial'), lHiveMat = value{i};
-    elseif strcmpi(prop{i}, 'convection'), lConvection = value{i};
-    elseif strcmpi(prop{i}, 'contact'), lContact = value{i};
-    elseif strcmpi(prop{i}, 'radiation'), lRadiation = value{i};
-    elseif strcmpi(prop{i}, 'mesh'), lMesh = value{i};
-    elseif strcmpi(prop{i}, 'plotOptions'), lPlotOptions = value{i};
-    elseif strcmpi(prop{i}, '3dPlotOptions'), l3DPlotOptions = value{i};
-    elseif strcmpi(prop{i}, 'plotColors'), lPlotColors = value{i};
-    elseif strcmpi(prop{i}, 'options'), lOptions = value{i};
-    else
-      error(sprintf('Invalid property <%s>', prop{i}));
-    endif
-  endfor
+    lHiveParams =   lParams.hiveParams;
+    lHiveMat =      lParams.hiveMat;
+    lConvection =   lParams.convection;
+    lContact =      lParams.contact;
+    lRadiation =    lParams.radiation;
+    lMesh =         lParams.mesh;
+    lOptions =      lParams.options;
+    lPlotOptions  = lParams.plotOptions;
+    lPlotColors =   lParams.plotColors;
+    l3DPlotOptions = lParams.plotOptions3d;
+  else
+    error('Invalid parameter');  prop = varargin(1:2:end);
+ ##    prop = varargin(1:2:end);
+##    value = varargin(2:2:end);
+##    assert(numel(prop) == numel(value), 'Invalid properties');
+##
+##    lHiveParams = struct();
+##    lHiveMat = struct();
+##    lConvection = struct();
+##    lContact = struct();
+##    lRadiation = struct();
+##    lMesh = struct();
+##    lPlotOptions = struct();
+##    l3DPlotOptions = struct();
+##    lPlotColors = struct();
+##    lOptions = struct();
+##
+##    for i=1:numel(prop)
+##      if strcmpi(prop{i}, 'hiveParams'), lHiveParams = value{i};
+##      elseif strcmpi(prop{i}, 'hiveMaterial'), lHiveMat = value{i};
+##      elseif strcmpi(prop{i}, 'convection'), lConvection = value{i};
+##      elseif strcmpi(prop{i}, 'contact'), lContact = value{i};
+##      elseif strcmpi(prop{i}, 'radiation'), lRadiation = value{i};
+##      elseif strcmpi(prop{i}, 'mesh'), lMesh = value{i};
+##      elseif strcmpi(prop{i}, 'plotOptions'), lPlotOptions = value{i};
+##      elseif strcmpi(prop{i}, '3dPlotOptions'), l3DPlotOptions = value{i};
+##      elseif strcmpi(prop{i}, 'plotColors'), lPlotColors = value{i};
+##      elseif strcmpi(prop{i}, 'options'), lOptions = value{i};
+##      else
+##        error(sprintf('Invalid property <%s>', prop{i}));
+##      endif
+##    endfor
+  endif
 
 
 % Create the figure(1) that will contain the geometry
@@ -603,5 +619,10 @@ endif
   faces.hiveBody1 = lMod_HiveBody1_faces;
   faces.hiveBody2 = lMod_HiveBody2_faces;
   faces.roofSides = lRoofSide_faces;
+  faces.sideWall1 = lMod_SideWall1_facesCell;
+  faces.sideWall2 = lMod_SideWall2_facesCell;
+
+  volumes = struct();
+  volumes.hiveBody = lMod_HiveBodyVolumes;
 
 endfunction

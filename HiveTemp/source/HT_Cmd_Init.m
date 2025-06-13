@@ -46,6 +46,7 @@ function F = HT_Cmd_Init(varargin)
   value = varargin(2:2:end);
 
   lCmdDefault = struct( '__type__', 'command', ...
+                        'enable', true, ...
                         'name', '', ...
                         'type', '', ...
                         'nodes', {{}}, ...
@@ -58,7 +59,7 @@ function F = HT_Cmd_Init(varargin)
 
   for k=1:numel(prop)
     if strcmpi(prop{k}, 'name')
-      if ~isempty(lCurrentCmd.name) % Add the previous command object to the list
+      if ~isempty(lCurrentCmd.name) && lCurrentCmd.enable % Add the previous command object to the list
         lCmdList = [lCmdList; INT_Finalize(lCurrentCmd)];
       endif
 
@@ -104,6 +105,8 @@ function F = HT_Cmd_Init(varargin)
       lCurrentCmd.area = value{k};
     elseif strcmpi(prop{k}, 'force')
       lCurrentCmd.force = value{k};
+    elseif strcmpi(prop{k}, 'enable')
+      lCurrentCmd.enable = value{k};
     else
       error(sprintf('Invalid parameter <%s>', strtrim(disp(prop{k}))));
     endif

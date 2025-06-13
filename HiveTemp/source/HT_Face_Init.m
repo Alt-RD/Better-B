@@ -106,7 +106,7 @@ function F = HT_Face_Init(varargin)
     nProp = numel(prop);
     for i=1:nProp
       if strcmpi(prop{i}, "size")
-        faceSize = HT_Round(value{i}, HT_VAR_EPSILON_POS);
+        faceSize = value{i}; %HT_Round(value{i}, HT_VAR_EPSILON_POS);
       elseif strcmpi(prop{i}, "nodes")
         nodes = value{i};
       elseif strcmpi(prop{i}, "position")
@@ -124,7 +124,7 @@ function F = HT_Face_Init(varargin)
       elseif strcmpi(prop{i}, "norm")
         norm = value{i};
       elseif strcmpi(prop{i}, "globalPosition")
-        globalPosition = HT_Round(value{i}, HT_VAR_EPSILON_POS);
+        globalPosition = value{i}; %HT_Round(value{i}, HT_VAR_EPSILON_POS);
       elseif strcmpi(prop{i}, "r")
         resistance = value{i};
       elseif strcmpi(prop{i}, "model")
