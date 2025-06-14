@@ -52,8 +52,8 @@ function [T infos] = HT_Result_GetVolumeTemperature(volume, Tmatrix, Tnodes, var
 
   assert(nargin >= 3, 'Missing input arguments');
   assert(HT_CheckType(volume, 'volume') || ...
-          (iscell(volume) && all(cellfun(RT_CheckType(v, 'volume'), volume))) || ...
-          (isstruct(volume) && all(arrayfun(RT_CheckType(v, 'volume'), volume))), 'Invalid volume object');
+          (iscell(volume) && all(cellfun(@(v) HT_CheckType(v, 'volume'), volume))) || ...
+          (isstruct(volume) && all(arrayfun(@(v) HT_CheckType(v, 'volume'), volume))), 'Invalid volume object');
   assert(isnumeric(Tmatrix) && (rows(Tmatrix) == numel(Tnodes)), 'Invalid temperature matrix or node list');
 
   T = [];

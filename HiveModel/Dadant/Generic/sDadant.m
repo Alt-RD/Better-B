@@ -46,18 +46,19 @@ HT_Init();
 % ========================================================================
 %                              PARAMETERS
 % ========================================================================
-sHiveModel_Dadant_setupParams();
+sDadant_setupParams();
 
 % ========================================================================
 %                            HIVE THERMAL MODEL
 % ========================================================================
-sHiveModel_Dadant_setupModel();
+[lModel lFaces lVolumes] = Dadant_setupModel(lParams);
 
 % ========================================================================
 %                               COMMANDS
 % ========================================================================
-assert(isfile(strcat(lCommand.scriptfile, '.m')), 'The specified file for command is not valid');
-eval(strcat(lCommand.scriptfile, ';'));
+assert(isfile(strcat(lParams.command.scriptFile, '.m')), 'The specified file for command is not valid');
+eval(strcat('[lCmd lCmdInfos]= ', lCommand.scriptFile, '(lParams, lFaces, lOptions);'));
+
 
 % ========================================================================
 %                               RESOLUTION
@@ -78,9 +79,7 @@ t = lComputation.startTime + (0:(lComputation.nt-1)) * lComputation.timeStep;
                 'unit', 'degres',                           ... % Warns the function that all temperature are expressed in degC.
                 'info', 'default'));
 
-
-return;
-
+sDadant_plot;
 
 % ============================== Model resolution ==============================
 

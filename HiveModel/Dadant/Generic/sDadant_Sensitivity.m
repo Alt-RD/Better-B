@@ -42,7 +42,7 @@ HT_Init();
 % ========================================================================
 %                          USER PARAMETERS
 % ========================================================================
-sHiveModel_Dadant_setupParams;
+sDadant_setupParams;
 
 % ========================================================================
 %                          SENSITIVITY
@@ -54,6 +54,12 @@ nParam = numel(lSensitivityAnalysis);
 lParameterData = struct(...
   'name', {lSensitivityAnalysis.name});
 
+% Sensitivity matrix
+XInfos = struct('name', '', ...
+                'X', repmat({{}}, nParam, 1),
+                'T', [], ...
+                'faces', [], ...
+                'volumes', []);
 
 for i=1:nParam
   disp(sprintf('=> Sensitivity analysis of parameter <%s>', lParameterData(i).name));
@@ -66,14 +72,15 @@ for i=1:nParam
   lOptions.verbose = false;
 
   % Build the thermal model
-  lModelP = HiveModel_Dadant_setupModel(lParamsPrev);
-  lModelN = HiveModel_Dadant_setupModel(lParamsNext);
+  [lModelP lFaceStructP lVolumeStructP] = Dadant_setupModel(lParamsPrev);
+  [lModelN lFaceStructN lVolumeStructN] = Dadant_setupModel(lParamsNext);
 
   % Solve the thermal model
   t = lComputation.startTime + (0:(lComputation.nt-1)) * lComputation.timeStep;
 
-  assert(isfile(strcat(lParamsPrev.command.scriptfile, '.m')), 'The specified file for command is not valid');
-  eval(strcat(lCommand.scriptfile, ';'));
+  % Setup commands
+  assert(isfile(strcat(lParamsPrev.command.scriptFile, '.m')), 'The specified file for command is not valid');
+  eval(strcat('lCmd = ', lCommand.scriptFile, '(lParamsPrev, lFaceStructP, lOptions);'));
 
   [TP] = HT_SolveModel(...
            lModelP,                                            ... Model to be solved
@@ -87,10 +94,10 @@ for i=1:nParam
                   'unit', 'degres',                           ... % Warns the function that all temperature are expressed in degC.
                   'info', 'default'));
 
-  assert(isfile(strcat(lParamsNext.command.scriptfile, '.m')), 'The specified file for command is not valid');
-  eval(strcat(lCommand.scriptfile, ';'));
+  assert(isfile(strcat(lParamsNext.command.scriptFile, '.m')), 'The specified file for command is not valid');
+  eval(strcat('lCmd = ', lCommand.scriptFile, '(lParamsNext, lFaceStructN, lOptions);'));
 
-  [TN faces] = HT_SolveModel(...
+  [TN] = HT_SolveModel(...
            lModelN,                                            ... Model to be solved
            lCmd,                                              ... List of commands
            lComputation.initTemperature,                      ... Initial temperature
@@ -103,9 +110,15 @@ for i=1:nParam
                   'info', 'default'));
 
   lUserData = lSensitivityAnalysis(i).getUserData(lParams);
-  X = lSensitivityAnalysis(i).compute(lUserData, TP, TN);
 
+  % Save results in the XInfos structure
+  XInfos(i).X = lSensitivityAnalysis(i).compute(lUserData, TP, TN);
+  XInfos(i).name = lParameterData(i).name;
+  XInfos(i).T = (TP+TN)/2;
+  XInfos(i).nodes = lModelN.nodes;
+  XInfos(i).faces = lFaceStructN;
+  XInfos(i).volumes = lVolumeStructN;
 endfor
 
-
+sDadant_SensitivityPlot;
 
