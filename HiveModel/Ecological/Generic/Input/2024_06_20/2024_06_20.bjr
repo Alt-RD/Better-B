@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Workspace dividerPosition="0.16657754010695186" schemaVersion="3.1.0" producerInfo="binjr v3.20.1 (build #20241110.5)">
+    <Sources>
+        <Source adapter="eu.binjr.sources.csv.adapters.CsvFileAdapter" id="e8a78f73-3e3f-48c7-8d7f-9400567498b8" name="[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)">
+            <AdapterParameters>
+                <AdapterParameter name="csvPath" value="C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv"/>
+                <AdapterParameter name="parsingProfile" value="{&quot;delimiter&quot;:&quot;,&quot;,&quot;quoteCharacter&quot;:&quot;\&quot;&quot;,&quot;timestampColumn&quot;:0,&quot;excludedColumns&quot;:[],&quot;readColumnNames&quot;:true,&quot;formattingLocale&quot;:&quot;en-US&quot;,&quot;trimCellValues&quot;:false,&quot;continueOnTimestampParsingFailure&quot;:false,&quot;captureGroups&quot;:{&quot;TIMEZONE&quot;:&quot;(Z|[+-]\\d{2}:?(\\d{2})?)&quot;,&quot;YEAR&quot;:&quot;\\d{4}&quot;,&quot;HOUR&quot;:&quot;\\d{2}&quot;,&quot;MILLI&quot;:&quot;\\d{3}&quot;,&quot;SECOND&quot;:&quot;\\d{2}&quot;,&quot;MONTH&quot;:&quot;\\d{2}&quot;,&quot;DAY&quot;:&quot;\\d{2}&quot;,&quot;MINUTE&quot;:&quot;\\d{2}&quot;},&quot;lineTemplateExpression&quot;:&quot;$YEAR[\\s\\/-]$MONTH[\\s\\/-]$DAY([-\\sT]$HOUR:$MINUTE:$SECOND)?([\\.,]$MILLI)?$TIMEZONE?&quot;,&quot;profileName&quot;:&quot;ISO timestamps&quot;,&quot;profileId&quot;:&quot;BUILTIN_ISO&quot;,&quot;regex&quot;:&quot;(?\u003cYEAR\u003e\\d{4})[\\s\\/-](?\u003cMONTH\u003e\\d{2})[\\s\\/-](?\u003cDAY\u003e\\d{2})([-\\sT](?\u003cHOUR\u003e\\d{2}):(?\u003cMINUTE\u003e\\d{2}):(?\u003cSECOND\u003e\\d{2}))?([\\.,](?\u003cMILLI\u003e\\d{3}))?(?\u003cTIMEZONE\u003e(Z|[+-]\\d{2}:?(\\d{2})?))?&quot;}"/>
+                <AdapterParameter name="zoneId" value="Europe/Paris"/>
+                <AdapterParameter name="encoding" value="utf-8"/>
+            </AdapterParameters>
+        </Source>
+        <Source adapter="eu.binjr.sources.csv.adapters.CsvFileAdapter" id="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" name="[CSV] 2024_06_20_Environment.csv (Europe/Paris)">
+            <AdapterParameters>
+                <AdapterParameter name="csvPath" value="C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv"/>
+                <AdapterParameter name="parsingProfile" value="{&quot;delimiter&quot;:&quot;,&quot;,&quot;quoteCharacter&quot;:&quot;\&quot;&quot;,&quot;timestampColumn&quot;:0,&quot;excludedColumns&quot;:[],&quot;readColumnNames&quot;:true,&quot;formattingLocale&quot;:&quot;en-US&quot;,&quot;trimCellValues&quot;:false,&quot;continueOnTimestampParsingFailure&quot;:false,&quot;captureGroups&quot;:{&quot;TIMEZONE&quot;:&quot;(Z|[+-]\\d{2}:?(\\d{2})?)&quot;,&quot;YEAR&quot;:&quot;\\d{4}&quot;,&quot;HOUR&quot;:&quot;\\d{2}&quot;,&quot;MILLI&quot;:&quot;\\d{3}&quot;,&quot;SECOND&quot;:&quot;\\d{2}&quot;,&quot;MONTH&quot;:&quot;\\d{2}&quot;,&quot;DAY&quot;:&quot;\\d{2}&quot;,&quot;MINUTE&quot;:&quot;\\d{2}&quot;},&quot;lineTemplateExpression&quot;:&quot;$YEAR[\\s\\/-]$MONTH[\\s\\/-]$DAY([-\\sT]$HOUR:$MINUTE:$SECOND)?([\\.,]$MILLI)?$TIMEZONE?&quot;,&quot;profileName&quot;:&quot;ISO timestamps&quot;,&quot;profileId&quot;:&quot;BUILTIN_ISO&quot;,&quot;regex&quot;:&quot;(?\u003cYEAR\u003e\\d{4})[\\s\\/-](?\u003cMONTH\u003e\\d{2})[\\s\\/-](?\u003cDAY\u003e\\d{2})([-\\sT](?\u003cHOUR\u003e\\d{2}):(?\u003cMINUTE\u003e\\d{2}):(?\u003cSECOND\u003e\\d{2}))?([\\.,](?\u003cMILLI\u003e\\d{3}))?(?\u003cTIMEZONE\u003e(Z|[+-]\\d{2}:?(\\d{2})?))?&quot;}"/>
+                <AdapterParameter name="zoneId" value="Europe/Paris"/>
+                <AdapterParameter name="encoding" value="utf-8"/>
+            </AdapterParameters>
+        </Source>
+    </Sources>
+    <Worksheets>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.7001061571125266" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Lunar hive">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Lunar hive temperature" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="degC" unitPrefixes="METRIC" yAxisMaxValue="47.937999999999995" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0x99b3ffff" displayName="Lunar.body.top.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="e8a78f73-3e3f-48c7-8d7f-9400567498b8" label="2" path="e8a78f73-3e3f-48c7-8d7f-9400567498b8/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv" treeHierarchy="/[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)/Lunar.body.top.T [deg]" legend="Lunar.body.top.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x334db3ff" displayName="Lunar.body.bot.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="e8a78f73-3e3f-48c7-8d7f-9400567498b8" label="3" path="e8a78f73-3e3f-48c7-8d7f-9400567498b8/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv" treeHierarchy="/[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)/Lunar.body.bot.T [deg]" legend="Lunar.body.bot.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x4d4d4dff" displayName="Lunar.overframe.south.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="e8a78f73-3e3f-48c7-8d7f-9400567498b8" label="4" path="e8a78f73-3e3f-48c7-8d7f-9400567498b8/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv" treeHierarchy="/[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)/Lunar.overframe.south.T [deg]" legend="Lunar.overframe.south.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xb3b3b3ff" displayName="Lunar.roof.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="e8a78f73-3e3f-48c7-8d7f-9400567498b8" label="5" path="e8a78f73-3e3f-48c7-8d7f-9400567498b8/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv" treeHierarchy="/[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)/Lunar.roof.T [deg]" legend="Lunar.roof.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x993300ff" displayName="Lunar.below.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="e8a78f73-3e3f-48c7-8d7f-9400567498b8" label="6" path="e8a78f73-3e3f-48c7-8d7f-9400567498b8/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_EcologicalHive.csv" treeHierarchy="/[CSV] 2024_06_20_EcologicalHive.csv (Europe/Paris)/Lunar.below.T [deg]" legend="Lunar.below.T [deg]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.7001061571125266" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Solar irradiance">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Solar irradiance (each faces of test hive)" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="Lux" unitPrefixes="METRIC" yAxisMaxValue="96082.8" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0xee9911ff" displayName="Test.luminosity.south.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="3" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.south.white [lux]" legend="Test.luminosity.south.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x5054e6ff" displayName="Test.luminosity.top.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="5" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.top.white [lux]" legend="Test.luminosity.top.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x66aa00ff" displayName="Test.luminosity.north.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="7" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.north.white [lux]" legend="Test.luminosity.north.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xef0aefff" displayName="Test.luminosity.west.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="9" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.west.white [lux]" legend="Test.luminosity.west.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x3366ccff" displayName="Test.luminosity.below.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="11" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.below.white [lux]" legend="Test.luminosity.below.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xbb44ccff" displayName="Test.luminosity.east.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="97cbbc4a-18d6-4e7f-8226-dc94f421cddc" label="13" path="97cbbc4a-18d6-4e7f-8226-dc94f421cddc/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Ecological\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.east.white [lux]" legend="Test.luminosity.east.white [lux]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+    </Worksheets>
+</Workspace>
