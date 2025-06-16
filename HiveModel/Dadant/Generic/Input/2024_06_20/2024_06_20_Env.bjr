@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Workspace dividerPosition="0.16657754010695186" schemaVersion="3.1.0" producerInfo="binjr v3.20.1 (build #20241110.5)">
+    <Sources>
+        <Source adapter="eu.binjr.sources.csv.adapters.CsvFileAdapter" id="9686c113-7466-4225-ba60-e236b9e26689" name="[CSV] 2024_06_20_RefHive.csv (Europe/Paris)">
+            <AdapterParameters>
+                <AdapterParameter name="csvPath" value="C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv"/>
+                <AdapterParameter name="parsingProfile" value="{&quot;delimiter&quot;:&quot;,&quot;,&quot;quoteCharacter&quot;:&quot;\&quot;&quot;,&quot;timestampColumn&quot;:0,&quot;excludedColumns&quot;:[],&quot;readColumnNames&quot;:true,&quot;formattingLocale&quot;:&quot;en-US&quot;,&quot;trimCellValues&quot;:false,&quot;continueOnTimestampParsingFailure&quot;:false,&quot;captureGroups&quot;:{&quot;DAY&quot;:&quot;\\d{2}&quot;,&quot;SECOND&quot;:&quot;\\d{2}&quot;,&quot;MINUTE&quot;:&quot;\\d{2}&quot;,&quot;YEAR&quot;:&quot;\\d{4}&quot;,&quot;MONTH&quot;:&quot;\\d{2}&quot;,&quot;HOUR&quot;:&quot;\\d{2}&quot;,&quot;MILLI&quot;:&quot;\\d{3}&quot;,&quot;TIMEZONE&quot;:&quot;(Z|[+-]\\d{2}:?(\\d{2})?)&quot;},&quot;lineTemplateExpression&quot;:&quot;$YEAR[\\s\\/-]$MONTH[\\s\\/-]$DAY([-\\sT]$HOUR:$MINUTE:$SECOND)?([\\.,]$MILLI)?$TIMEZONE?&quot;,&quot;profileName&quot;:&quot;ISO timestamps&quot;,&quot;profileId&quot;:&quot;BUILTIN_ISO&quot;,&quot;regex&quot;:&quot;(?\u003cYEAR\u003e\\d{4})[\\s\\/-](?\u003cMONTH\u003e\\d{2})[\\s\\/-](?\u003cDAY\u003e\\d{2})([-\\sT](?\u003cHOUR\u003e\\d{2}):(?\u003cMINUTE\u003e\\d{2}):(?\u003cSECOND\u003e\\d{2}))?([\\.,](?\u003cMILLI\u003e\\d{3}))?(?\u003cTIMEZONE\u003e(Z|[+-]\\d{2}:?(\\d{2})?))?&quot;}"/>
+                <AdapterParameter name="zoneId" value="Europe/Paris"/>
+                <AdapterParameter name="encoding" value="utf-8"/>
+            </AdapterParameters>
+        </Source>
+        <Source adapter="eu.binjr.sources.csv.adapters.CsvFileAdapter" id="b31ca67f-3136-4f54-8c8d-dff029971954" name="[CSV] 2024_06_20_TestHive.csv (Europe/Paris)">
+            <AdapterParameters>
+                <AdapterParameter name="csvPath" value="C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv"/>
+                <AdapterParameter name="parsingProfile" value="{&quot;delimiter&quot;:&quot;,&quot;,&quot;quoteCharacter&quot;:&quot;\&quot;&quot;,&quot;timestampColumn&quot;:0,&quot;excludedColumns&quot;:[],&quot;readColumnNames&quot;:true,&quot;formattingLocale&quot;:&quot;en-US&quot;,&quot;trimCellValues&quot;:false,&quot;continueOnTimestampParsingFailure&quot;:false,&quot;captureGroups&quot;:{&quot;DAY&quot;:&quot;\\d{2}&quot;,&quot;SECOND&quot;:&quot;\\d{2}&quot;,&quot;MINUTE&quot;:&quot;\\d{2}&quot;,&quot;YEAR&quot;:&quot;\\d{4}&quot;,&quot;MONTH&quot;:&quot;\\d{2}&quot;,&quot;HOUR&quot;:&quot;\\d{2}&quot;,&quot;MILLI&quot;:&quot;\\d{3}&quot;,&quot;TIMEZONE&quot;:&quot;(Z|[+-]\\d{2}:?(\\d{2})?)&quot;},&quot;lineTemplateExpression&quot;:&quot;$YEAR[\\s\\/-]$MONTH[\\s\\/-]$DAY([-\\sT]$HOUR:$MINUTE:$SECOND)?([\\.,]$MILLI)?$TIMEZONE?&quot;,&quot;profileName&quot;:&quot;ISO timestamps&quot;,&quot;profileId&quot;:&quot;BUILTIN_ISO&quot;,&quot;regex&quot;:&quot;(?\u003cYEAR\u003e\\d{4})[\\s\\/-](?\u003cMONTH\u003e\\d{2})[\\s\\/-](?\u003cDAY\u003e\\d{2})([-\\sT](?\u003cHOUR\u003e\\d{2}):(?\u003cMINUTE\u003e\\d{2}):(?\u003cSECOND\u003e\\d{2}))?([\\.,](?\u003cMILLI\u003e\\d{3}))?(?\u003cTIMEZONE\u003e(Z|[+-]\\d{2}:?(\\d{2})?))?&quot;}"/>
+                <AdapterParameter name="zoneId" value="Europe/Paris"/>
+                <AdapterParameter name="encoding" value="utf-8"/>
+            </AdapterParameters>
+        </Source>
+        <Source adapter="eu.binjr.sources.csv.adapters.CsvFileAdapter" id="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" name="[CSV] 2024_06_20_Environment.csv (Europe/Paris)">
+            <AdapterParameters>
+                <AdapterParameter name="csvPath" value="C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv"/>
+                <AdapterParameter name="parsingProfile" value="{&quot;delimiter&quot;:&quot;,&quot;,&quot;quoteCharacter&quot;:&quot;\&quot;&quot;,&quot;timestampColumn&quot;:0,&quot;excludedColumns&quot;:[],&quot;readColumnNames&quot;:true,&quot;formattingLocale&quot;:&quot;en-US&quot;,&quot;trimCellValues&quot;:false,&quot;continueOnTimestampParsingFailure&quot;:false,&quot;captureGroups&quot;:{&quot;DAY&quot;:&quot;\\d{2}&quot;,&quot;SECOND&quot;:&quot;\\d{2}&quot;,&quot;MINUTE&quot;:&quot;\\d{2}&quot;,&quot;YEAR&quot;:&quot;\\d{4}&quot;,&quot;MONTH&quot;:&quot;\\d{2}&quot;,&quot;HOUR&quot;:&quot;\\d{2}&quot;,&quot;MILLI&quot;:&quot;\\d{3}&quot;,&quot;TIMEZONE&quot;:&quot;(Z|[+-]\\d{2}:?(\\d{2})?)&quot;},&quot;lineTemplateExpression&quot;:&quot;$YEAR[\\s\\/-]$MONTH[\\s\\/-]$DAY([-\\sT]$HOUR:$MINUTE:$SECOND)?([\\.,]$MILLI)?$TIMEZONE?&quot;,&quot;profileName&quot;:&quot;ISO timestamps&quot;,&quot;profileId&quot;:&quot;BUILTIN_ISO&quot;,&quot;regex&quot;:&quot;(?\u003cYEAR\u003e\\d{4})[\\s\\/-](?\u003cMONTH\u003e\\d{2})[\\s\\/-](?\u003cDAY\u003e\\d{2})([-\\sT](?\u003cHOUR\u003e\\d{2}):(?\u003cMINUTE\u003e\\d{2}):(?\u003cSECOND\u003e\\d{2}))?([\\.,](?\u003cMILLI\u003e\\d{3}))?(?\u003cTIMEZONE\u003e(Z|[+-]\\d{2}:?(\\d{2})?))?&quot;}"/>
+                <AdapterParameter name="zoneId" value="Europe/Paris"/>
+                <AdapterParameter name="encoding" value="utf-8"/>
+            </AdapterParameters>
+        </Source>
+    </Sources>
+    <Worksheets>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.6480891719745223" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Test hive">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Test hive temperatures" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="degC" unitPrefixes="METRIC" yAxisMaxValue="76.58630000000001" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0x999999ff" displayName="Test.roof [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="2" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.roof [deg]" legend="Test.roof [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x4d4d4dff" displayName="Test.overframe [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="3" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.overframe [deg]" legend="Test.overframe [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x99b3ffff" displayName="Test.body.top.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="5" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.body.top.T [deg]" legend="Test.body.top.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x334db3ff" displayName="Test.body.bottom.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="7" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.body.bottom.T [deg]" legend="Test.body.bottom.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x993300ff" displayName="Test.below [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="8" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.below [deg]" legend="Test.below [deg]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Test hive humidity" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="RH %" unitPrefixes="METRIC" yAxisMaxValue="119.41237000000001" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0x99b3ffff" displayName="Test.body.top.HR [%]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="4" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.body.top.HR [%]" legend="Test.body.top.HR [%]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x334db3ff" displayName="Test.body.bottom.HR [%]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="b31ca67f-3136-4f54-8c8d-dff029971954" label="6" path="b31ca67f-3136-4f54-8c8d-dff029971954/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_TestHive.csv" treeHierarchy="/[CSV] 2024_06_20_TestHive.csv (Europe/Paris)/Test.body.bottom.HR [%]" legend="Test.body.bottom.HR [%]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.7011677282377919" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Reference hive">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Reference hive temperatures" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="-" unitPrefixes="METRIC" yAxisMaxValue="78.4583" yAxisMinValue="-13.7653">
+                    <SeriesList>
+                        <Timeseries displayColor="0x999999ff" displayName="Ref.roof [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="9686c113-7466-4225-ba60-e236b9e26689" label="2" path="9686c113-7466-4225-ba60-e236b9e26689/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv" treeHierarchy="/[CSV] 2024_06_20_RefHive.csv (Europe/Paris)/Ref.roof [deg]" legend="Ref.roof [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x4d4d4dff" displayName="Ref.overframe [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="9686c113-7466-4225-ba60-e236b9e26689" label="3" path="9686c113-7466-4225-ba60-e236b9e26689/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv" treeHierarchy="/[CSV] 2024_06_20_RefHive.csv (Europe/Paris)/Ref.overframe [deg]" legend="Ref.overframe [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x99b3ffff" displayName="Ref.body.top.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="9686c113-7466-4225-ba60-e236b9e26689" label="5" path="9686c113-7466-4225-ba60-e236b9e26689/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv" treeHierarchy="/[CSV] 2024_06_20_RefHive.csv (Europe/Paris)/Ref.body.top.T [deg]" legend="Ref.body.top.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x334db3ff" displayName="Ref.body.bottom.T [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="9686c113-7466-4225-ba60-e236b9e26689" label="7" path="9686c113-7466-4225-ba60-e236b9e26689/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv" treeHierarchy="/[CSV] 2024_06_20_RefHive.csv (Europe/Paris)/Ref.body.bottom.T [deg]" legend="Ref.body.bottom.T [deg]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x993300ff" displayName="Ref.below [deg]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="9686c113-7466-4225-ba60-e236b9e26689" label="8" path="9686c113-7466-4225-ba60-e236b9e26689/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_RefHive.csv" treeHierarchy="/[CSV] 2024_06_20_RefHive.csv (Europe/Paris)/Ref.below [deg]" legend="Ref.below [deg]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.7011677282377919" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Solar irradiance (Test hive)">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Solar irradiance (each faces of test hive)" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="Lux" unitPrefixes="METRIC" yAxisMaxValue="96082.8" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0xee9911ff" displayName="Test.luminosity.south.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="3" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.south.white [lux]" legend="Test.luminosity.south.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x5054e6ff" displayName="Test.luminosity.top.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="5" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.top.white [lux]" legend="Test.luminosity.top.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x66aa00ff" displayName="Test.luminosity.north.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="7" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.north.white [lux]" legend="Test.luminosity.north.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xef0aefff" displayName="Test.luminosity.west.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="9" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.west.white [lux]" legend="Test.luminosity.west.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0x3366ccff" displayName="Test.luminosity.below.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="11" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.below.white [lux]" legend="Test.luminosity.below.white [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xbb44ccff" displayName="Test.luminosity.east.white [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="13" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Test.luminosity.east.white [lux]" legend="Test.luminosity.east.white [lux]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+        <Worksheet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xyChartsWorksheet" chartLayout="STACKED" dividerPosition="0.7011677282377919" fromDateTime="2024-05-20T07:57:53.999+02:00[Europe/Paris]" minChartHeight="150.0" timeRangeLinked="false" timeZone="Europe/Paris" toDateTime="2024-05-27T07:54:08.001+02:00[Europe/Paris]" name="Solar irradiance">
+            <Charts>
+                <Chart alwaysIncludeOriginInAutoScale="true" autoScaleYAxis="true" chartType="LINE" graphOpacity="0.7" name="Solar irradiance (weather station)" showAreaOutline="false" strokeWidth="1.9848484848484849" unit="Lux" unitPrefixes="METRIC" yAxisMaxValue="73202.8" yAxisMinValue="0.0">
+                    <SeriesList>
+                        <Timeseries displayColor="0xbb44ccff" displayName="Luminosity.horiz.WHITE [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="15" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Luminosity.horiz.WHITE [lux]" legend="Luminosity.horiz.WHITE [lux]"/>
+                        </Timeseries>
+                        <Timeseries displayColor="0xdd5555ff" displayName="Luminosity.45.LUX [lux]" selected="true">
+                            <Binding prefix="UNDEFINED" graphType="UNDEFINED" unitName="-" sourceId="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4" label="18" path="1b3636a4-5cb4-44ec-9a43-2ca3dfaaf0f4/C:\Users\emmanuel\Documents\Projets\Collectif\BetterB-HorizonEurope\Github\Better-B\HiveModel\Dadant\Generic\Input\2024_06_20\2024_06_20_Environment.csv" treeHierarchy="/[CSV] 2024_06_20_Environment.csv (Europe/Paris)/Luminosity.45.LUX [lux]" legend="Luminosity.45.LUX [lux]"/>
+                        </Timeseries>
+                    </SeriesList>
+                </Chart>
+            </Charts>
+        </Worksheet>
+    </Worksheets>
+</Workspace>
