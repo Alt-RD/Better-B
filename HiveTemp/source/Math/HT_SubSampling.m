@@ -8,7 +8,8 @@
 %  Agency (REA), SERI or UKRI. Neither the European Union nor the granting
 %  authorities can be held responsible for them.
 %
-%  Copyright (c) 2025 AltRD-Emmanuel Ruffio
+%  Copyright (c) 2022: Montpellier University
+%  Copyright (c) 2023-2025: CoActions-AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@alt-rd.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -24,16 +25,17 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function L = HT_CellUnwrap(L)
-  lNewCell = {};
 
-  for i=1:numel(L)
-    if iscell(L{i})
-      lNewCell = [lNewCell; HT_CellUnwrap(L{i})(:)];
-    else
-      lNewCell = [lNewCell; L{i}];
-    endif
-  endfor
+% Sous échantillonne un tableau par moyennage sur les colonnes
+% N=numel(D) -> numel(y) = (N - N%n)/n
+% Le tableau d'entrée est coupé pour correspondre au sous échantillonnage
+function y = HT_SubSampling(D, n)
+  y = D(1:(idivide(size(D,1), int32(n))*n), :);
 
-  L = lNewCell(:);
+  if n >= 1
+    y = nanmean(reshape(y, n, numel(y)/n), 1);
+    %y = reshape(y, numel(y)/2, 2);
+    y = reshape(y, numel(y)/size(D,2), size(D,2)); % Change 13/04/2020
+  endif
+
 endfunction

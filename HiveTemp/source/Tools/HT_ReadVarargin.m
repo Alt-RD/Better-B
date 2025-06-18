@@ -25,18 +25,23 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function [lKeys lValues lParams lOptions] = HT_ReadVarargin(args)
+function [lKeys lValues lParams lOptions] = HT_ReadVarargin(lDefaultParams, lDefaultOptions, args)
+  assert(nargin == 3, 'Missing parameters');
+
+  if isempty(lDefaultParams), lDefaultParams = struct(); endif
+  if isempty(lDefaultOptions), lDefaultOptions = struct(); endif
+
   lKeys = {};
   lValues = {};
-  lParams = struct();
-  lOptions = struct();
+  lParams = lDefaultParams;
+  lOptions = lDefaultOptions;
 
   if isempty(args)
     return;
   endif
 
   if isstruct(args{1})        % If first parameter is a struct, parameters are loaded from it
-    lParams = args{1};
+    lParams = INT_MergeStruct(lParams, args{1});
 
     if (mod(numel(args), 2) == 0)
       assert(isstruct(args{end}), 'Invalid arguments <args>. End param must be a struct');
@@ -52,13 +57,21 @@ function [lKeys lValues lParams lOptions] = HT_ReadVarargin(args)
     if (mod(numel(args), 2) == 1)
       assert(isstruct(args{end}), 'Invalid arguments <args>. End param must be a struct');
 
-      lOptions = args{end};
+      lOptions = INT_MergeStruct(lOptions, args{end});
       lKeys = args(1:2:(end-1));
       lValues = args(2:2:(end-1));
     else
       lKeys = args(1:2:end);
       lValues = args(2:2:end);
     endif
+  endif
+
+  % If a default structure was specified, make sure all properties lKeys
+  % are found in that structure
+  if ~isempty(lParams)
+    lFieldNames = fieldnames(lParams);
+    lValidKeys = cellfun(@(v) any(strcmpi(v, lFieldNames)), lKeys);
+    assert(all(lValidKeys), sprintf('Some keys are invalid: %s', strjoin(lFieldNames(~lValidKeys))));
   endif
 
   if isargout(3)
@@ -72,4 +85,17 @@ function [lKeys lValues lParams lOptions] = HT_ReadVarargin(args)
       endif
     endfor
   endif
+endfunction
+
+function obj1 = INT_MergeStruct(obj1, obj2)
+  if isempty(obj1)
+    obj1 = obj2;
+    return;
+  endif
+
+  lField2 = fieldnames(obj2);
+  for i=1:numel(lField2);
+    assert(isfield(obj1, lField2{i}));
+    obj1 = setfield(obj1, lField2{i}, getfield(obj2, lField2{i}));
+  endfor
 endfunction

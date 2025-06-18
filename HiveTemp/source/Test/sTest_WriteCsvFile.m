@@ -8,7 +8,8 @@
 %  Agency (REA), SERI or UKRI. Neither the European Union nor the granting
 %  authorities can be held responsible for them.
 %
-%  Copyright (c) 2025 AltRD-Emmanuel Ruffio
+%  Copyright (c) 2022: Montpellier University
+%  Copyright (c) 2023-2025: CoActions-AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@alt-rd.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -24,16 +25,25 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function L = HT_CellUnwrap(L)
-  lNewCell = {};
+clear variables;
 
-  for i=1:numel(L)
-    if iscell(L{i})
-      lNewCell = [lNewCell; HT_CellUnwrap(L{i})(:)];
-    else
-      lNewCell = [lNewCell; L{i}];
-    endif
-  endfor
+% Specify the main directory of HiveTemp library (relative or absolute)
+HT_VAR_LIB_PATH = '../';
+addpath(make_absolute_filename(HT_VAR_LIB_PATH));
 
-  L = lNewCell(:);
-endfunction
+% Init the library
+HT_Init();
+
+D = magic(3);
+
+HT_WriteCsvFile(D, 'file', 'test.csv', ...
+                    'format', {'%5d', '%5d', '%5d'}, ...
+                    'separator', ',', ...
+                    'compress', 'false', ...
+                    'titles', {'column 0', 'col1', 'c2'});
+
+R = mat2cell(D, ones(3,1), ones(1,3));
+HT_WriteCsvFile(R, 'file', 'test2.csv', ...
+                    'format', {'%5d', '%5d', '%5d'}, ...
+                    'titles', []);
+
