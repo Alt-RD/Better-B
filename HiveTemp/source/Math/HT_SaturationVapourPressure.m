@@ -8,7 +8,8 @@
 %  Agency (REA), SERI or UKRI. Neither the European Union nor the granting
 %  authorities can be held responsible for them.
 %
-%  Copyright (c) 2025 AltRD-Emmanuel Ruffio
+%  Copyright (c) 2022: Montpellier University
+%  Copyright (c) 2023-2025: CoActions-AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@alt-rd.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -24,34 +25,15 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-% Vérification des paramètres d'entrée
-function P = HT_CheckField(P, field, value, chkFunc)
-  assert(nargin >= 3);
-
-  if nargin < 4, chkFunc = {}; endif;
-
-  % Convert to cell array
-  if ~iscell(chkFunc), chkFunc = {chkFunc}; endif;
-
-  lChkExist = false;
-
-  for i=1:numel(chkFunc)
-    if strcmpi(chkFunc{i}, 'exist')
-      lChkExist = true;
-      break;
-    endif
-  endfor
-
-  if ~isfield(P, field)
-    assert(~lChkExist, sprintf('Field <%s> does not exist', field));
-
-    P = setfield(P, field, value);
-  else  % 12/01/2023: put the function test in the "else" condition to allow invalid data to be specified as default
-    for i=1:numel(chkFunc)
-      if strcmp(class(chkFunc{i}), 'function_handle')
-        assert(chkFunc{i}(getfield(P, field)), sprintf('Check failed: field <%s> and function index <%d>', field, i));
-      endif
-    endfor
+% Returns the saturation pressure for water vapour in air
+function P = HT_SaturationVapourPressure(T, unit)
+##  P = 0.61094*exp(17.625*T./(T+243.04));
+  assert(nargin == 2);
+  assert(any(strcmpi(unit, {'degres', 'kelvin'})));
+  if strcmpi(unit, 'degres')
+    T += 273.15;
   endif
 
+  P = 101325*exp(13.7-5120./T);
 endfunction
+

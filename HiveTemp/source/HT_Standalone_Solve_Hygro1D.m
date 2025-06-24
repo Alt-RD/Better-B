@@ -94,6 +94,8 @@ function [Wmat infos] = HT_Standalone_Solve_Hygro1D(lParams, lOptions)
     clear lParamList lValidParam lValidParamList;
   endif
 
+  assert(numel(lParams) == 1, 'Invalid parameter structure');
+
   % Set default parameter values
   lParams = HT_CheckField(lParams, 'n',              [],                 @(v) isnumeric(v) && isscalar(v) && (round(v) == v) && v > 0);
   lParams = HT_CheckField(lParams, 'u',              [],                 @(v) isnumeric(u) && iscolumn(u) && all(u >= 0.0 & u <= 1.0) && all(diff(u) > 0) && (numel(u) == lParams.n || isempty(lParams.n)));
@@ -103,7 +105,7 @@ function [Wmat infos] = HT_Standalone_Solve_Hygro1D(lParams, lOptions)
   lParams = HT_CheckField(lParams, 'type',           'isotherm',         {@(v) ischar(v) && any(strcmpi(v, 'isotherm'))});
   lParams = HT_CheckField(lParams, 'diffusion',      [],                 {"exist", @(v) is_function_handle(v) || (all(isnumeric(v(:))) && ((isrow(v) && numel(v)==2) || (columns(v)==3)))  });
   lParams = HT_CheckField(lParams, 'convection',     [],                 {"exist", @(v) is_function_handle(v) || (all(isnumeric(v(:))) && ((isrow(v) && numel(v)==2) || (columns(v)==3))) });
-  lParams = HT_CheckField(lParams, 'weq',            [],                 {"exist", @(v) all(isnumeric(v(:))), @(v) (isrow(v) && numel(v)==2) || (columns(v)==3)});
+  lParams = HT_CheckField(lParams, 'weq',            [],                 {"exist", @(v) all(cellfun(@(f) is_function_handle(f), v)) || all(isnumeric(v(:))) && ((isrow(v) && numel(v)==2) || (columns(v)==3))});
   lParams = HT_CheckField(lParams, 'winit',          [],                 {"exist", @(v) all(isnumeric(v(:))) && any(numel(v) == [1 lParams.n]) });
   lParams = HT_CheckField(lParams, 'gridType',       'ff',               @(v) ischar(v) && any(strcmpi(v, {'ff', 'hf', 'fh', 'hh'})));
   lParams = HT_CheckField(lParams, 't',              [],                 {'exist', @(v) iscolumn(v) && all(diff(v) > 0) });
@@ -171,17 +173,20 @@ function [Wmat infos] = HT_Standalone_Solve_Hygro1D(lParams, lOptions)
     error('Invalid parameter <lParams.convection>');
   endif
 
-  if isrow(lParams.weq)
+  if isrow(lParams.weq) && isnumeric(lParams.weq)
     a = lParams.weq;
     lLayer.weq_left = @(t, i, W) a(1);
     lLayer.weq_right = @(t, i, W) a(2);
-  elseif columns(lParams.weq) == 3
+  elseif (columns(lParams.weq) == 3) && isnumeric(lParams.weq)
     weq = lParams.weq;
     lLayer.weq_left = @(t, i, W) interp1(weq(:,1), weq(:,2), t);
     lLayer.weq_right = @(t, i, W) interp1(weq(:,1), weq(:,3), t);
-  elseif columns(lParams.weq) == 2
+  elseif (columns(lParams.weq) == 2) && isnumeric(lParams.weq)
     lLayer.weq_left = @(t, i, W) weq(i,1);
     lLayer.weq_right = @(t, i, W) weq(i,2);
+  elseif numel(lParams.weq) == 2 && all(cellfun(@(v) is_function_handle(v), lParams.weq))
+    lLayer.weq_left = lParams.weq{1};
+    lLayer.weq_right = lParams.weq{2};
   else
     error('Invalid parameter <lParams.weq>');
   endif
