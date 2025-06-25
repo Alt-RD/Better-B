@@ -42,13 +42,20 @@ HT_Init();
 % ========================================================================
 %                          USER PARAMETERS
 % ========================================================================
+% Load hive parameters
 sDadant_setupParams;
+
+% Load parameters related to sensitivity study
+% The file containing the parameters is specified by "lSensitivityParams.parameterFile"
+lSetupFile = lSensitivityParams.parameterFile;
+if endsWith(lSetupFile, '.m'), lSetupFile((end-1):end) = []; endif;
+eval(strcat(lSetupFile, ';'));
+
+lCacheReset = true; % If true, the cache file is erased.
 
 % ========================================================================
 %                          SENSITIVITY
 % ========================================================================
-##eval(lHiveParamSetupScript);      % Setup Parameters
-
 nParam = numel(lSensitivityAnalysis);
 
 lParameterData = struct(...
@@ -58,16 +65,49 @@ lParameterData = struct(...
 XInfos = struct('name', '', ...
                 'X', repmat({{}}, nParam, 1),
                 'T', [], ...
+                't', [], ...
                 'faces', [], ...
-                'volumes', []);
+                'volumes', [], ...
+                'nodes', []);
+
+lAbsoluteDependencyFile = cellfun(@(v) make_absolute_filename(v), lSensitivityParams.dependencies, 'UniformOutput', false);
+lFileStats = struct('file', lSensitivityParams.dependencies, ...
+                    'absoluteFile', lAbsoluteDependencyFile, ...
+                    'stat', cellfun(@(v) stat(v), lAbsoluteDependencyFile, 'UniformOutput', false));
+
+do
+  % Attempt to reload data from cache file
+  lCacheAbsoluteFilePath = lSensitivityParams.cacheFile;
+
+  if ~isempty(lCacheAbsoluteFilePath)
+    lCacheAbsoluteFilePath = make_absolute_filename(lCacheAbsoluteFilePath);
+  endif
+  if ~lCacheReset && ~isempty(lCacheAbsoluteFilePath) && isfile(lCacheAbsoluteFilePath)
+    lCacheData = load(lCacheAbsoluteFilePath);
+    if ~isfield(lCacheData, 'fileStats'), break; endif
+    if ~isequal(lCacheData.fileStats, lFileStats), break; endif
+    if ~isfield(lCacheData, 'sensitivityParams') || ~isequal(lCacheData.sensitivityParams, lSensitivityParams), break; endif
+
+    for i=1:nParam
+      % Try to find the parameter name in the cache data
+      ind = find(strcmpi({lCacheData.XInfos.name}, lSensitivityAnalysis(i).name));
+      if ~isempty(ind)
+        XInfos(i) = lCacheData.XInfos(ind);
+        disp(sprintf('=> Reload data from backup file: Parameter <%s>', lParameterData(i).name));
+      endif
+    endfor
+  endif
+until true;
 
 for i=1:nParam
+  if ~isempty(XInfos(i).name), continue; endif; % Loaded from cache file ?
+
   disp(sprintf('=> Sensitivity analysis of parameter <%s>', lParameterData(i).name));
 
   % Compute sensitivity using finite difference
   % Parameters of the "prev"/"next" model with slight change of one parameter
-  lParamsPrev = lSensitivityAnalysis(i).setterPrev(lParams);
-  lParamsNext = lSensitivityAnalysis(i).setterNext(lParams);
+  lParamsPrev = lSensitivityAnalysis(i).setterPrev(lSensitivityAnalysis(i), lParams);
+  lParamsNext = lSensitivityAnalysis(i).setterNext(lSensitivityAnalysis(i), lParams);
 
   lOptions.verbose = false;
 
@@ -82,7 +122,7 @@ for i=1:nParam
   assert(isfile(strcat(lParamsPrev.command.scriptFile, '.m')), 'The specified file for command is not valid');
   eval(strcat('lCmd = ', lCommand.scriptFile, '(lParamsPrev, lFaceStructP, lOptions);'));
 
-  [TP] = HT_SolveModel(...
+  [TP, ~, TnodesP] = HT_SolveModel(...
            lModelP,                                            ... Model to be solved
            lCmd,                                              ... List of commands
            lComputation.initTemperature,                      ... Initial temperature
@@ -97,7 +137,7 @@ for i=1:nParam
   assert(isfile(strcat(lParamsNext.command.scriptFile, '.m')), 'The specified file for command is not valid');
   eval(strcat('lCmd = ', lCommand.scriptFile, '(lParamsNext, lFaceStructN, lOptions);'));
 
-  [TN] = HT_SolveModel(...
+  [TN, ~, TnodesN] = HT_SolveModel(...
            lModelN,                                            ... Model to be solved
            lCmd,                                              ... List of commands
            lComputation.initTemperature,                      ... Initial temperature
@@ -109,16 +149,25 @@ for i=1:nParam
                   'unit', 'degres',                           ... % Warns the function that all temperature are expressed in degC.
                   'info', 'default'));
 
-  lUserData = lSensitivityAnalysis(i).getUserData(lParams);
+  assert(all(strcmp(TnodesN, TnodesP)));
 
   % Save results in the XInfos structure
-  XInfos(i).X = lSensitivityAnalysis(i).compute(lUserData, TP, TN);
+  XInfos(i).X = lSensitivityAnalysis(i).compute(lSensitivityAnalysis(i), lParams, TP, TN);
   XInfos(i).name = lParameterData(i).name;
+  XInfos(i).t = t;
   XInfos(i).T = (TP+TN)/2;
-  XInfos(i).nodes = lModelN.nodes;
+  XInfos(i).nodes = TnodesN;
   XInfos(i).faces = lFaceStructN;
   XInfos(i).volumes = lVolumeStructN;
 endfor
+
+if ~isempty(lCacheAbsoluteFilePath)
+  sensitivityParams = lSensitivityParams;
+  fileStats = lFileStats;
+
+  save('-binary', lCacheAbsoluteFilePath, 'XInfos','sensitivityParams', 'fileStats');
+  clear sensitivityParams fileStats;
+endif
 
 sDadant_SensitivityPlot;
 

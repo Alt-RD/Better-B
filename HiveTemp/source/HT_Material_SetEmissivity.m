@@ -55,6 +55,15 @@ function mat = HT_Material_SetEmissivity(mat, varargin)
       lParams = setfield(lParams, 'epsModel', values{i});
     elseif strcmpi(props{i}, 'parameters')
       lParams = setfield(lParams, 'epsParameters', values{i});
+    elseif strcmpi(props{i}, 'update') % In this case, a vector [2x1] is specified containing [wavelength value, emissivity value]
+      assert(numel(values{i}) == 2);
+      lWavelength = values{i}(1);
+      assert(lWavelength > 0.1, 'Invalid wavelength'); % Unit must be 'um'
+      assert(columns(mat.eps) == 2, 'Attempt to set a emissivity for particular wavelength, but existing material is not compatible');
+      ind = find(mat.eps(:,1) == lWavelength);
+      assert(~isempty(ind), sprintf('Attempt to update a emissivity at wavelength %.1fum but existing material does not define this wavelength', lWavelength));
+      lParams.eps = mat.eps;
+      lParams.eps(ind,2) = values{i}(2);
     else
       error(sprintf('Material_SetEmissivity::Invalid argument <%s>', props{i}));
     endif

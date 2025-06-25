@@ -35,6 +35,7 @@ for i=1:nParam
   if lPlotOptions.onlyOneFigure, clf; subplot(1,nParam,i); else figure(1+i); clf; endif
 
   disp(sprintf('Plotting sensitivity of parameter <%s>', XInfos(i).name));
+  t = XInfos(i).t;
 
   % Extract the temperature evolution of node called "nbody"
   tplot = 0:600:t(end);

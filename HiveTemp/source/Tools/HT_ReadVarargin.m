@@ -25,8 +25,10 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-function [lKeys lValues lParams lOptions] = HT_ReadVarargin(lDefaultParams, lDefaultOptions, args)
-  assert(nargin == 3, 'Missing parameters');
+function [lKeys lValues lParams lOptions] = HT_ReadVarargin(lDefaultParams, lDefaultOptions, args, type)
+  assert(nargin >= 3, 'Missing parameters');
+  if nargin < 4, type = 'struct'; endif
+  assert(any(strcmpi(type, {'struct', 'struct array'})));
 
   if isempty(lDefaultParams), lDefaultParams = struct(); endif
   if isempty(lDefaultOptions), lDefaultOptions = struct(); endif
@@ -71,7 +73,7 @@ function [lKeys lValues lParams lOptions] = HT_ReadVarargin(lDefaultParams, lDef
   if ~isempty(lParams)
     lFieldNames = fieldnames(lParams);
     lValidKeys = cellfun(@(v) any(strcmpi(v, lFieldNames)), lKeys);
-    assert(all(lValidKeys), sprintf('Some keys are invalid: %s', strjoin(lFieldNames(~lValidKeys))));
+    assert(all(lValidKeys), sprintf('Some keys are invalid: %s', strjoin(lKeys(~lValidKeys))));
   endif
 
   if isargout(3)
@@ -84,6 +86,15 @@ function [lKeys lValues lParams lOptions] = HT_ReadVarargin(lDefaultParams, lDef
         lFieldNames = [lFieldNames; lKeys{i}];
       endif
     endfor
+
+    if strcmpi(type, 'struct array')
+      lFieldNames = fieldnames(lParams);
+
+      lCells = cell(2*numel(lFieldNames), 1);
+      lCells(1:2:end) = lFieldNames;
+      lCells(2:2:end) = cellfun(@(v) getfield(lParams, v), lFieldNames, 'UniformOutput', false);
+      lParams = struct(lCells{:});
+    endif
   endif
 endfunction
 

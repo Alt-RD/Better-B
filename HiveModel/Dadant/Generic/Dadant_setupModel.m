@@ -1,6 +1,15 @@
 %  This file is part of project HiveTemp.
+%  This work was supported by the Better-B project, which has received funding
+%  from the European Union, the Swiss State Secretariat for Education, Research
+%  and Innovation (SERI) and UK Research and Innovation (UKRI) under the UK
+%  government's Horizon Europe funding guarantee (grant number 10068544). Views
+%  and opinions expressed are however those of the author(s) only and do not
+%  necessarily reflect those of the European Union, European Research Executive
+%  Agency (REA), SERI or UKRI. Neither the European Union nor the granting
+%  authorities can be held responsible for them.
 %
-%  Copyright (c) 2022: Montpellier University / CoActions-AltRD-Emmanuel Ruffio
+%  Copyright (c) 2022: Montpellier University
+%  Copyright (c) 2023-2025: CoActions-AltRD-Emmanuel Ruffio
 %  Author: emmanuel.ruffio@gmail.com
 %
 %  HiveTemp is free software: you can redistribute it and/or modify
@@ -416,7 +425,7 @@ function [M faces volumes] = Dadant_setupModel(varargin)
             'dim',            lRoofSize,                        ...
             'axis',           lHiveParams.globalAxis,                      ...
             'length',         lHiveParams.roofThickness,        ...
-            'material',       lHiveMat.roof_ext,                ... % Retrieve the material specified in the header (generally air)
+            'material',       lHiveMat.roof_ext,                ... % Retrieve the material specified in the header
             'n',              [NA NA lMesh.roof],                        ... % Only specify the number of nodes for in-depth direction
             'zGridType',      'ff',                             ... % Specify full node size on boundaries (instead of half). This mode must be selected to allow 1 node only in the z-direction
             'xGrid',          { lMod_Underroof_faces{FaceZP} }, ... % Underroof faces are provided as "xgrid" so that the xdirection mesh will be adpated
@@ -427,9 +436,9 @@ function [M faces volumes] = Dadant_setupModel(varargin)
     lOptions);
   lModel = HT_Model_Merge(lModel, lMod_Roof, lOptions);
 
-  lMod_Tmp = HT_Model_Connect('mRoof_ExtAir', lAirExtNode, ...             ... % Node of outside air
-                                    lMod_Roof_faces(FaceZP),    ... % Top face of the roof
-                                    'g', lConvection.roof_ext{FaceZP},  ... % Convection coefficient specified by user
+  lMod_Tmp = HT_Model_Connect('mRoof_ExtAir', lAirExtNode,                  ... % Node of outside air
+                                    lMod_Roof_faces(FaceZP),                ... % Top face of the roof
+                                    'g', lConvection.roof_ext{FaceZP},      ... % Convection coefficient specified by user
                                     lOptions);
   lModel = HT_Model_Merge(lModel, lMod_Tmp, lOptions);
 
@@ -468,7 +477,7 @@ function [M faces volumes] = Dadant_setupModel(varargin)
               'dim',            [NA; lHiveParams.roofHeight],     ... %
               'axis',           lRoofSizeAxis{i},                 ...
               'length',         lHiveParams.roofThickness,        ...
-              'material',       lHiveMat.roofsides_ext,           ... % Retrieve the material specified in the header (generally air)
+              'material',       lHiveMat.roofsides_ext,           ... % Retrieve the material specified in the header
               'n',              [NA NA lMesh.roof],               ...
               'zGridType',      'ff',                             ... % Specify full node size on boundaries (instead of half). This mode must be selected to allow 1 node only in the z-direction
               'xGrid',          [],                               ... % Load from <.base> face
@@ -522,7 +531,7 @@ function [M faces volumes] = Dadant_setupModel(varargin)
       struct( 'base',           lSideFace,                                ... % Internal face
               'axis',           lRoofSizeAxis{i},                         ...
               'length',         lHiveParams.roofIntExtra([1 2 1 2])(i),   ...
-              'material',       lHiveMat.roofsideAir,                     ... % Retrieve the material specified in the header (generally air)
+              'material',       lHiveMat.roofsideAir,                     ... % Retrieve the material specified in the header
               'n',              [NA NA lMesh.airside],                    ...
               'zGridType',      'ff',                                     ... % Specify full node size on boundaries (instead of half). This mode must be selected to allow 1 node only in the z-direction
               'xGrid',          { lRoofSide_faces{i}(FaceZM) },           ... % Load from <.base> face
