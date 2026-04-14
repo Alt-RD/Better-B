@@ -25,17 +25,48 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
+% Split the vector of time based on time difference
+% If the time difference between 2 samples exceeds <maxHoleTime>, the vector
+% is split.
+% SETCELL is a cellarray of time value. Cell content is sorted and cells are sorted
+% INDCELL is a cellarray containing the index of each value of SELCELL in the original
+%         time vector.
+function [SETCELL INDCELL] = HT_CsvSplitWithHoleTime(tvec, _maxHoleTime)
+  if columns(tvec) == 6
+    % Convert to datenum
+    tvec = datenum(tvec);
+  endif
+  assert(columns(tvec) == 1, sprintf('Invalid time vector size. Number of columns is %d instead of 1', columns(tvec)));
 
-% Sous échantillonne un tableau par moyennage sur les colonnes
-% N=numel(D) -> numel(y) = (N - N%n)/n
-% Le tableau d'entrée est coupé pour correspondre au sous échantillonnage
-function y = HT_SubSampling(D, n)
-  y = D(1:(idivide(size(D,1), int32(n))*n), :);
+  isort = [];
+  if !issorted(tvec)
+    [tvec isort] = sort(tvec, 'ascend');
+  endif
 
-  if n >= 1
-    y = mean(reshape(y, n, numel(y)/n), 1, 'omitnan');
-    %y = reshape(y, numel(y)/2, 2);
-    y = reshape(y, numel(y)/size(D,2), size(D,2)); % Change 13/04/2020
+  lDifft = tvec(2:end) - tvec(1:end-1);
+  lSplit = find(lDifft > _maxHoleTime);
+
+  if ~isempty(lSplit)
+    INDCELL = cell(numel(lSplit)+1, 1);
+    INDCELL{1} = 1:lSplit(1);
+
+    for i=2:numel(lSplit)
+      INDCELL{i} = (lSplit(i-1)+1):lSplit(i);
+    endfor
+    INDCELL{end} = (lSplit(end)+1):numel(tvec);
+    INDCELL(cellfun(@(v) numel(v) == 1, INDCELL)) = []; % Remove sets than contain only one element
+  else
+    INDCELL = { 1:numel(tvec) };
+  endif
+
+  if isargout(1)
+    SETCELL = cellfun(@(v) tvec(v), INDCELL, 'UniformOutput', false);
+  endif
+
+  if isargout(2)
+    if ~isempty(isort)
+      INDCELL = cellfun(@(v) isort(v), INDCELL, 'UniformOutput', false);
+    endif
   endif
 
 endfunction
