@@ -24,7 +24,7 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-% Vérification des paramètres d'entrée
+% VÃ©rification des paramÃ¨tres d'entrÃ©e
 function P = HT_CheckField(P, field, value, chkFunc)
   assert(nargin >= 3);
 

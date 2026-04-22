@@ -16,7 +16,7 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-% Script d'initialisation des variables globales utilisées par le logiciel HiveTemp
+% Script d'initialisation des variables globales utilisÃ©es par le logiciel HiveTemp
 
 X=1; Y=2; Z=3;
 DIRstr = {'X', 'Y', 'Z'};

@@ -56,11 +56,12 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
 
   lParameters = HT_CheckField(lParameters, 'cacheFile',    '', @(v) ischar(v));
   lParameters = HT_CheckField(lParameters, 'options',    '', @(v) any(strcmpi({'', 'scan', 'reject'}, v)));
+  lBackupParameters = lParameters;
 
   if ~isempty(lParameters.cacheFile) && ~lParameters.forceReload && isfile(lParameters.cacheFile)
     lFileData = load(lParameters.cacheFile);
 
-    if isfield(lFileData, 'parameters') && isequal(lFileData.parameters, lParameters)
+    if isfield(lFileData, 'parameters') && isequaln(lFileData.parameters, lParameters)
 ##    if isfield(lFileData, 'parameters') && isfield(lFileData.parameters, 'columns') && isequal(lFileData.parameters, lParameters)
       D = lFileData.data;
       titles = lFileData.titles;
@@ -192,14 +193,15 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
       [lCacheDir, lCacheName, lCacheExt] = fileparts(lParameters.cacheFile);
 
       lCacheFullDir = make_absolute_filename(lCacheDir);
-      if ~isfolder(lCacheFullDir)
+      if ~isempty(lCacheFullDir) && ~isfolder(lCacheFullDir)
         lStatus = mkdir(lCacheFullDir);
         assert(islogical(lStatus) && lStatus, sprintf('Could not create cache directory <%s>', lCacheFullDir));
       endif
 
-      parameters = lParameters;
-      data = D;
-      save(lParameters.cacheFile, 'data', 'titles', 'parameters', 'header');
+      parameters = lBackupParameters;
+      data = lData;
+      titles = lDataTitles;
+      save('-binary', lParameters.cacheFile, 'data', 'titles', 'parameters', 'header');
     endif
 
     if lOptions.verbose, disp("Read done..."); endif;

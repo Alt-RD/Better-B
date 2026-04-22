@@ -24,8 +24,8 @@
 %  You should have received a copy of the GNU General Public License
 %  along with HiveTemp.  If not, see <https://www.gnu.org/licenses/>
 % ========================================================================
-% Résolution du modèle
-% Chaque élément de commande (liste de structure <C>)
+% RÃ©solution du modÃ¨le
+% Chaque Ã©lÃ©ment de commande (liste de structure <C>)
 % .name = nom de la commande
 % .data = scalar/matrix/function handle @(t,i,[index],[userData])
 %         If <index> is present, it specifies a non uniform type command.
@@ -38,8 +38,8 @@
 %         1) The first is a scalar will go in U vector
 %         2) The second is a vector that will go in command matrix B
 %
-% Arguments d'entrée
-% .T0 = température initiale [1x1] ou [1xnNode]
+% Arguments d'entrÃ©e
+% .T0 = tempÃ©rature initiale [1x1] ou [1xnNode]
 % .tVec = vecteur temps
 %         ou cell dim3x1 = {startTime, dt, nt}
 % .options = structure d'options
@@ -63,7 +63,7 @@
 %                         If radiation problems are specified, the proper conversion will be done.
 %
 % arguments de sortie
-% T vecteur des températures [(1 ou nTimes) x nNode]
+% T vecteur des tempÃ©ratures [(1 ou nTimes) x nNode]
 % U vecteur des commandes [(1 ou nTimes) x nCmd]
 % Gnodes le nom des noeuds de chaque ligne du vecteur T
 
@@ -139,7 +139,7 @@ function [Tmat, Umat, Gnodes, Unodes, t] = HT_SolveModel(M, Cmd, T0, tVec, optio
     lConvertUnitOffset = 0;
   endif
 
-  % Vérification des commandes
+  % VÃ©rification des commandes
   assert(all(HT_CheckType(Cmd, 'command')), 'Invalid command list');
   lCmdNameList = cellfun(@(v) v.name, Cmd, "UniformOutput", false);
   % Duplicate command ?
@@ -563,7 +563,7 @@ function [Tmat, Umat, Gnodes, Unodes, t] = HT_SolveModel(M, Cmd, T0, tVec, optio
   clear ind1 ind2 lValid_ind1 lValid_ind2s lNodesToValidNodes lNodesToTCmdNodes;
   endif
 
-  % Resolution numérique
+  % Resolution numÃ©rique
 
   userData = [];
   iT = 1;
@@ -913,7 +913,7 @@ function [dA, db] = INT_ApplyRadiationMatrix(lRadiationMatrix, lRadiationMatrixC
 %09/06/2023 it seems there is an error
 ##  dA = -2*lRadiationMatrix * spdiags(lTLastExp3/273.15, 0, numel(lTLastExp3), numel(lTLastExp3)); % .* (Tlast'/273.15).^3/273.15; % Columns are multiplied by Tlast
 ##  db = -lRadiationMatrix * (lTLastExp3 .* lTLastExp1);
-% Je ne comprends pas pour la linéarisation pose problème ici.
+% Je ne comprends pas pour la linÃ©arisation pose problÃ¨me ici.
   dA = 0;
   db = lRadiationMatrix * (lTLastExp3 .* lTLastExp1);
 
