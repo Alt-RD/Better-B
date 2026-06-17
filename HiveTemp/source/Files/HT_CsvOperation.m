@@ -45,9 +45,12 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
                         'timeFormat2', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
                         'timeOutputFormat', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
                         'timeOutputTitle', '', ...
+                        'prefix1', '', ...
                         'maxHoleTime', 1200/86400, ... [day]
                         'check', true, ...
-                        'forceReload', false);
+                        'forceReload', false, ...
+                        'removeEmptyLines', true, ...
+                        'cacheFile', '');
 
   lOptions = struct('skipFieldCheck', false, ...
                     'verbose', true);
@@ -197,6 +200,24 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
                                           'fillColumn', true, ... % Fill missing columns with NA
                                           'subSampling', 0));
 
+      if ~isempty(lParameters.prefix1)
+        if iscell(lParameters.prefix1)
+          lPrefix = lParameters.prefix1{i};
+        else
+          lPrefix = lParameters.prefix1;
+        endif
+
+        lPrefix = strrep(lPrefix, '%(index)', num2str(i));
+        if ischar(lFileHandleSource)
+          lPrefix = strrep(lPrefix, '%(file)', num2str(i));
+        else
+          lPrefix = strrep(lPrefix, '%(file)', sprintf('handle%d',i));
+        endif
+
+        lIsDataColumn = ~strcmpi(lParameters.timeColumn1, T);
+        T(lIsDataColumn) = cellfun(@(v) strcat(lPrefix, '.', v), T(lIsDataColumn), 'UniformOutput', false);
+      endif
+
       fclose(lFileHandle);
       lFileHandle = 0;
       lFileHandleSource = [];
@@ -305,6 +326,8 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       [lInter1 lInterInd1] = HT_CsvSplitWithHoleTime(time1, lParameters.maxHoleTime);
       [lInter2 lInterInd2] = HT_CsvSplitWithHoleTime(time2, lParameters.maxHoleTime);
 
+      assert(~isempty(lInter1) || ~isempty(lInter2), "No valid time range were found. Check maxHoleTimeValue");
+
       [lInterInd1, lInterInd2] = Int_IntersectSets(lInter1, lInterInd1, lInter2, lInterInd2);
 
       lSubSetTime1 = NA(numel(time1), 1);
@@ -378,6 +401,16 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       time1Title = lParameters.timeOutputTitle;
     else
       time1Title = lParameters.timeColumn1;
+    endif
+
+    if lParameters.removeEmptyLines && ~isempty(data)
+      lRemoveFlag = true(numel(data{1}), 1);
+      for i=1:numel(data)
+        lRemoveFlag = lRemoveFlag & (isna(data{i}) | isnan(data{i}));
+      endfor
+
+      time1(lRemoveFlag,:) = [];
+      data = cellfun(@(v) v(~lRemoveFlag), data, 'UniformOutput', false);
     endif
 
     data = [{time1}, data];

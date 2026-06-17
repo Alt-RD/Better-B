@@ -19,7 +19,7 @@ lOperations = struct( 'name', 'Substract ambiant air temperature', ...
 
 [D T H] = HT_CsvOperation({'TestCsvOperation.csv'}, {}, lOperations, 'timeColumn1', 'Timestamp', 'timeColumn2', 'Timestamp');
 
-HT_CsvWrite('TestCsvOperation_OutFile.csv', D, T);
+%HT_CsvWrite('TestCsvOperation_OutFile.csv', D, T);
 
 
 

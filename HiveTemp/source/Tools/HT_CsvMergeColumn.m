@@ -28,7 +28,9 @@
 function [D T msg newCol missingCol] = HT_CsvMergeColumn(D, T, Dnew, Tnew, varargin)
   msg = {};
 
-  lParameters = struct('position', 'after');
+  lParameters = struct('position', 'after', ...
+                       'titleFilter', @(s) s, ...
+                       'emptyValue', NaN);
 
   lOptions = struct('skipFieldCheck', false, ...
                     'verbose', true);
@@ -36,6 +38,14 @@ function [D T msg newCol missingCol] = HT_CsvMergeColumn(D, T, Dnew, Tnew, varar
   [lKeys lValues lParameters lOptions] = HT_ReadVarargin(lParameters, lOptions, varargin);
 
   if lOptions.verbose, disp("== Merging csv column =="); endif;
+
+  T = cellfun(@(v) lParameters.titleFilter(v), T, 'UniformOutput', false);
+  Tnew = cellfun(@(v) lParameters.titleFilter(v), Tnew, 'UniformOutput', false);
+
+  assert(numel(Tnew) == numel(unique(Tnew)), 'Duplicate column titles found in new data, once filtered');
+  assert(isscalar(lParameters.emptyValue));
+
+  lBuildEmptyArray = @(line, col) repmat(lParameters.emptyValue, line, col);
 
   % ==============================================================
   lColIndices = cellfun(@(v) find(strcmpi(T, v)), Tnew, 'UniformOutput', false);
@@ -61,7 +71,7 @@ function [D T msg newCol missingCol] = HT_CsvMergeColumn(D, T, Dnew, Tnew, varar
   else
     lDataRowCount = 0;
   endif
-  D(numel(D)+1:numel(T)) = NA(lDataRowCount,1); % Add empty columns to the data
+  D(numel(D)+1:numel(T)) = lBuildEmptyArray(lDataRowCount,1); % Add empty columns to the data
 ##  D = [D, repmat({NA(lDataRowCount,1)}, 1, sum(lColNotFound))];
 
   % Add the new data into the old array
@@ -72,7 +82,7 @@ function [D T msg newCol missingCol] = HT_CsvMergeColumn(D, T, Dnew, Tnew, varar
 
   % Add empty data to columns that were not present in new data
   tmp = rows(Dnew{1});
-  D(lColNoData) = arrayfun(@(i) [D{lColNoData(i)}; NA(tmp,1)], 1:numel(lColNoData), 'UniformOutput', false);
+  D(lColNoData) = arrayfun(@(i) [D{lColNoData(i)}; lBuildEmptyArray(tmp,1)], 1:numel(lColNoData), 'UniformOutput', false);
 ##  NA(tmp,1);
 ##  for i=1:numel(lColNoData)
 ##    D{lColNoData(i)} = [D{lColNoData(i)}; NA(tmp,1) ];

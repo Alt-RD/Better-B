@@ -45,7 +45,8 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
                         'bufferLine', 1000, ...
                         'timeColumn', [], ... Specify the time column (necessary of subsampling if the format is not epoch)
                         'timeFormat', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
-                        'subSampling', 1);
+                        'subSampling', 1, ...
+                        'titleFilter', '');
 
   lOptions = struct('skipFieldCheck', false, ...
                     'verbose', true);
@@ -78,6 +79,10 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
 
   lRejectColumnMode = any(strcmpi(lParameters.options, 'reject'));
   lScanMode = any(strcmpi(lParameters.options, 'scan')) || ~isargout(1);
+  lTitleFilter = @(s) s; % Identity by default
+  if ~isempty(lParameters.titleFilter)
+    lTitleFilter = str2func(lParameters.titleFilter);
+  endif
 
   unwind_protect
     if ischar(_file)
@@ -86,6 +91,8 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
       lFileHandle = _file;
       lParameters.maxHeaderLine = lParameters.bufferLine; % If a file handle is provided, the option maxHeaderLine is discarded
     endif
+
+    assert(lFileHandle > 0, 'Invalid file handle');
 
     lData = {};
     lDataTitles = {};
@@ -96,6 +103,9 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
     lCurrentLine += lInfos.lineCount-1;
 
     while  ~feof(lFileHandle)
+      if lCurrentLine == 4037
+        x = 4;
+      endif
       % Find next title line
       [lTitleFormat, lTitleLine, ~, lInfos] = HT_CsvGuessFormat(lFileHandle, 'maxLineSearch', lParameters.bufferLine, 'comment', lParameters.comment, 'delimiter', lParameters.delimiter);
 
@@ -148,7 +158,13 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
 ##          lTitleFormat = lCurrentTitleFormat;
 ##        endif
 
-        [lData, lDataTitles, msg, newCol, ~] = HT_CsvMergeColumn(lData, lDataTitles, D, DTitles, struct('position', 'after'), lOptions);
+      if numel(unique(cellfun(@(v) numel(v), D))) != 1
+        x = 4;
+      endif
+
+        disp(sprintf('Processing at line %d', lCurrentLine));
+
+        [lData, lDataTitles, msg, newCol, ~] = HT_CsvMergeColumn(lData, lDataTitles, D, DTitles, struct('position', 'after', 'titleFilter', lTitleFilter), lOptions);
         if ~isempty(msg), cellfun(@(v) disp(sprintf('Msg at line %d: %s', lCurrentLine, v)), msg); endif;
       endif
 
@@ -201,7 +217,8 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
       parameters = lBackupParameters;
       data = lData;
       titles = lDataTitles;
-      save('-binary', lParameters.cacheFile, 'data', 'titles', 'parameters', 'header');
+##      save('-binary', lParameters.cacheFile, 'data', 'titles', 'parameters', 'header');
+      save(lParameters.cacheFile, 'data', 'titles', 'parameters', 'header');
     endif
 
     if lOptions.verbose, disp("Read done..."); endif;
@@ -210,7 +227,7 @@ function [D titles header] = HT_ReadCsvFile(_file, varargin)
     D = lData;
 
   unwind_protect_cleanup
-    if ischar(_file) && (lFileHandle != 0)
+    if ischar(_file) && (lFileHandle > 0)
       fclose(lFileHandle);
     endif
   end_unwind_protect

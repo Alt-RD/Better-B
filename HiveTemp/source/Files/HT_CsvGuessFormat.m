@@ -100,7 +100,12 @@ function [F T comments infos] = HT_CsvGuessFormat(_file, varargin)
       lIsTitleLine = Int_IsTitleLine(tmp, lParameters);
       %~startsWith(tmp, lParameters.comment) && ~isempty(tmp);
       if lIsTitleLine
-        if isempty(lColumnTitle)
+        if lDataLineCount > 0 % Some data were found before the title line
+          % Return the block of data before the current line
+          infos.blockRange(2) = tmpFilePos;
+          infos.skipRange(2) = tmpFilePos;
+          break;
+        elseif isempty(lColumnTitle)
           infos.skipRange(2) = tmpFilePos;
           lColumnTitle = tmp;
         else % Two successive title line were found
@@ -177,12 +182,14 @@ function F = Int_GetFormat(_str)
   _str = strtrim(_str);
   if startsWith(_str, '"')
     F = '%q';
+  elseif strcmpi(_str, "nan")
+    F = '%f';
   else
-    [lValue lOk] = str2num(_str);
-    if lOk
-      F = '%f';
-    else
+    lValue = str2double(_str);
+    if isnan(lValue)
       F = '%q';
+    else
+      F = '%f';
     endif
   endif
 endfunction
@@ -202,7 +209,7 @@ function R = Int_IsTitleLine(_str, _parameters)
   endif
 
   _str = _str(1:ind);
-  if (_str(1) >= '0') && (_str(1) <= '9')
+  if ((_str(1) >= '0') && (_str(1) <= '9')) || (_str(1) == '"')
     R = false;
   else
     R = true;

@@ -35,7 +35,7 @@ function V = HT_AddToTimeVec(V, N, unit)
     V(1) += N;
   elseif strcmpi(unit, 'month')
     V(2) += N;
-    lAddYear = floor(V(2)-1)/12;
+    lAddYear = floor((V(2)-1)/12);
     V(2) -= lAddYear * 12;
     V(1) += lAddYear;
   elseif strcmpi(unit, 'day')

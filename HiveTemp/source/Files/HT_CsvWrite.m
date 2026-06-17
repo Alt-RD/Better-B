@@ -79,9 +79,15 @@ function S = HT_CsvWrite(_file, _data, _titles, varargin)
     _data{lStrColumn(i)} = strvcat(_data{lStrColumn(i)});
   endfor
 
+  lFormatLine = strcat(strjoin(lFormatList, _parameters.delimiter), "\n");
+
   for i=1:lColumnSize
-    lLine = arrayfun(@(k) sprintf(lFormatList{k}, _data{k}(i,:)), 1:numel(_titles), 'UniformOutput', false);
-    fprintf(lFileHandle, strcat(strjoin(lLine, _parameters.delimiter), "\n"));
+    lDataLine = arrayfun(@(k) _data{k}(i,:), 1:numel(_titles), 'UniformOutput', false);
+    lLine = sprintf(lFormatLine, lDataLine{:});
+    fprintf(lFileHandle, lLine);
+
+##        lLine = arrayfun(@(k) sprintf(lFormatList{k}, _data{k}(i,:)), 1:numel(_titles), 'UniformOutput', false);
+##    fprintf(lFileHandle, strcat(strjoin(lLine, _parameters.delimiter), "\n"));
 
     if (mod(i,100) == 0) && _options.verbose
       disp(sprintf("Writing data %d/%d", i, lColumnSize));
