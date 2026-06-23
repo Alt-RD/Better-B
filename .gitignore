@@ -3,5 +3,6 @@ HiveModel/Dadant/Generic/sTest.m
 HiveModel/Ecological/Generic/sTest.m
 HiveTemp/source/Test/sTest.m
 /HiveModel/Dadant/Generic/Cache
-*.zip
 *.mat
+HiveModel/Dadant/Generic/Input/2024_12_23/2024_12_23_Schema.pptx
+HiveTemp/source/Test/TestCsvOperationSN9-ADAAURA.csv
