@@ -44,12 +44,13 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
                         'timeFormat1', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
                         'timeFormat2', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
                         'timeOutputFormat', 'yyyy/mm/ddTHH:MM:SS.FFF', ...
-                        'timeOutputTitle', '', ...
+                        'timeOutputTitle', 'Timestamp', ...
                         'prefix1', '', ...
                         'maxHoleTime', 1200/86400, ... [day]
                         'check', true, ...
                         'forceReload', false, ...
                         'removeEmptyLines', true, ...
+                        'interpolation', 'linear', ... Used in interp1 (cubic)
                         'cacheFile', '');
 
   lOptions = struct('skipFieldCheck', false, ...
@@ -69,6 +70,10 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       return;
     endif
   endif
+
+  if ischar(lParameters.timeOutputFormat), lParameters.timeOutputFormat = { lParameters.timeOutputFormat}; endif
+  if ischar(lParameters.timeOutputTitle), lParameters.timeOutputTitle = { lParameters.timeOutputTitle}; endif
+  assert(numel(lParameters.timeOutputFormat) == numel(lParameters.timeOutputTitle));
 
   if ischar(_files1), _files1 = { _files1 }; endif
   if ischar(_files2), _files2 = { _files2 }; endif
@@ -100,48 +105,89 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
     lRejectColFlag1 = arrayfun(@(v) any(strcmpi(v.options1, 'reject')), _ops);
     lRejectColFlag2 = arrayfun(@(v) any(strcmpi(v.options2, 'reject')), _ops);
 
-    if any(lRejectColFlag1)
-      if lOptions.verbose, disp(sprintf('Some operations reject columns. Scanning %d source files 1 to retrieve column titles', numel(_files1))); endif
+    lWildcardColFlag1 = arrayfun(@(v) any(strcmpi(v.options1, 'wildcard')), _ops);
+    lWildcardColFlag2 = arrayfun(@(v) any(strcmpi(v.options2, 'wildcard')), _ops);
+
+    if any(lRejectColFlag1) || any(lWildcardColFlag1)
+      if lOptions.verbose, disp(sprintf('Some operations need column names to be read first. Scanning %d source files 1 to retrieve column titles', numel(_files1))); endif
 
       T = Int_GetAllColumnTitles(_files1, lParameters);
 
       if lOptions.verbose, disp(sprintf(' -> %d columns retrieved', numel(T))); endif
 
-      if lParameters.check
-        lRejectColumnList = HT_CellUnwrap({_ops(lRejectColFlag1).source1});
-        lColumnExistList = cellfun(@(v) any(strcmpi(T, v)), lRejectColumnList);
-        assert(all(lColumnExistList), sprintf('Some columns are rejected but do not exist: <%s>', strjoin(lRejectColumnList(~lColumnExistList), ';')));
-        clear lRejectColumnList lColumnExistList;
-      endif
+      % Apply the wildcard filter to the column titles
+      lWildcardColFlag1 = find(lWildcardColFlag1);
+      for i=1:numel(lWildcardColFlag1)
+        lOpsSource1 = _ops(lWildcardColFlag1(i)).source1;
 
-      lRejectColFlag1 = find(lRejectColFlag1);
+        lWildCardListIndex = find(index(lOpsSource1, '*') > 0); % Returns the index of wildcard in the list of column names
+        lColumnNameList = arrayfun(@(p) HT_CellStrFilter(T, lOpsSource1{p}), lWildCardListIndex, 'UniformOutput', false);
 
-      for i=1:numel(lRejectColFlag1)
-        _ops(lRejectColFlag1(i)).source1 = T(cellfun(@(v) ~any(strcmpi(_ops(lRejectColFlag1(i)).source1, v)), T));
+        for k=1:numel(lWildCardListIndex)
+          lOpsSource1{lWildCardListIndex(k)} = T(lColumnNameList{k});
+        endfor
+
+        lOpsSource1 = unique(HT_CellUnwrap(lOpsSource1));
+        _ops(lWildcardColFlag1(i)).source1 = lOpsSource1;
+        clear lOpsSource1 lWildCardListIndex lColumnNameList;
       endfor
 
-      clear T;
+      if any(lRejectColFlag1)
+        if lParameters.check
+          lRejectColumnList = HT_CellUnwrap({_ops(lRejectColFlag1).source1});
+          lColumnExistList = cellfun(@(v) any(strcmpi(T, v)), lRejectColumnList);
+          assert(all(lColumnExistList), sprintf('Some columns are rejected but do not exist: <%s>', strjoin(lRejectColumnList(~lColumnExistList), ';')));
+          clear lRejectColumnList lColumnExistList;
+        endif
+
+        lRejectColFlag1 = find(lRejectColFlag1);
+
+        for i=1:numel(lRejectColFlag1)
+          _ops(lRejectColFlag1(i)).source1 = T(cellfun(@(v) ~any(strcmpi(_ops(lRejectColFlag1(i)).source1, v)), T));
+        endfor
+      endif
+
+      clear T lRejectColFlag1;
     endif
 
-    if any(lRejectColFlag2)
-      if lOptions.verbose, disp(sprintf('Some operations reject columns. Scanning %d source files 2 to retrieve column titles', numel(_files2))); endif
+    if any(lRejectColFlag2) || any(lWildcardColFlag2)
+      if lOptions.verbose, disp(sprintf('Some operations need column names to be read first. Scanning %d source files 1 to retrieve column titles', numel(_files2))); endif
 
       T = Int_GetAllColumnTitles(_files2, lParameters);
 
       if lOptions.verbose, disp(sprintf(' -> %d columns retrieved', numel(T))); endif
 
-      if lParameters.check
-        lRejectColumnList = HT_CellUnwrap({_ops(lRejectColFlag2).source2});
-        lColumnExistList = cellfun(@(v) any(strcmpi(T, v)), lRejectColumnList);
-        assert(all(lColumnExistList), sprintf('Some columns are rejected but do not exist: <%s>', strjoin(lRejectColumnList(~lColumnExistList), ';')));
-        clear lRejectColumnList lColumnExistList;
-      endif
+      % Apply the wildcard filter to the column titles
+      lWildcardColFlag2 = find(lWildcardColFlag2);
+      for i=1:numel(lWildcardColFlag2)
+        lOpsSource2 = _ops(lWildcardColFlag2(i)).source2;
 
-      lRejectColFlag2 = find(lRejectColFlag2);
+        lWildCardListIndex = find(index(lOpsSource2, '*') > 0); % Returns the index of wildcard in the list of column names
+        lColumnNameList = arrayfun(@(p) HT_CellStrFilter(T, lOpsSource2{p}), lWildCardListIndex, 'UniformOutput', false);
 
-      for i=1:numel(lRejectColFlag2)
-        _ops(lRejectColFlag2(i)).source1 = T(cellfun(@(v) ~any(strcmpi(_ops(lRejectColFlag2(i)).source1, v)), T));
+        for k=1:numel(lWildCardListIndex)
+          lOpsSource2{lWildCardListIndex(k)} = T(lColumnNameList{k});
+        endfor
+
+        lOpsSource2 = unique(HT_CellUnwrap(lOpsSource2));
+        _ops(lWildcardColFlag2(i)).source2 = lOpsSource2;
+        clear lOpsSource2 lWildCardListIndex lColumnNameList;
       endfor
+
+      if any(lRejectColFlag2)
+        if lParameters.check
+          lRejectColumnList = HT_CellUnwrap({_ops(lRejectColFlag2).source2});
+          lColumnExistList = cellfun(@(v) any(strcmpi(T, v)), lRejectColumnList);
+          assert(all(lColumnExistList), sprintf('Some columns are rejected but do not exist: <%s>', strjoin(lRejectColumnList(~lColumnExistList), ';')));
+          clear lRejectColumnList lColumnExistList;
+        endif
+
+        lRejectColFlag2 = find(lRejectColFlag2);
+
+        for i=1:numel(lRejectColFlag2)
+          _ops(lRejectColFlag2(i)).source1 = T(cellfun(@(v) ~any(strcmpi(_ops(lRejectColFlag2(i)).source1, v)), T));
+        endfor
+      endif
 
       clear T;
     endif
@@ -333,7 +379,7 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       lSubSetTime1 = NA(numel(time1), 1);
       lSubSetTime1(lInterInd1) = time1(lInterInd1);
 
-      data2 = cellfun(@(v) interp1(time2, v, lSubSetTime1), data2, 'UniformOutput', false);
+      data2 = cellfun(@(v) interp1(time2, v, lSubSetTime1, NA, lParameters.interpolation), data2, 'UniformOutput', false);
     elseif isempty(_files2)
       % If no source 2 is specified, it is implicitly set to source 1
       data2 = data1;
@@ -391,18 +437,6 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       titles = [titles, lOutputColumnNames];
     endfor
 
-    % Add the time
-    if ~strcmpi(lParameters.timeOutputFormat, 'epoch')
-      time1 = arrayfun(@(v) strftime('%Y/%m/%dT%H:%M:%S.000', gmtime(v)), time1, 'UniformOutput', false);
-##      time1 = cellstr(datestr(time1, lParameters.timeOutputFormat));
-    endif
-
-    if ~isempty(lParameters.timeOutputTitle)
-      time1Title = lParameters.timeOutputTitle;
-    else
-      time1Title = lParameters.timeColumn1;
-    endif
-
     if lParameters.removeEmptyLines && ~isempty(data)
       lRemoveFlag = true(numel(data{1}), 1);
       for i=1:numel(data)
@@ -413,8 +447,43 @@ function [data titles header] = HT_CsvOperation(_files1, _files2, _ops, varargin
       data = cellfun(@(v) v(~lRemoveFlag), data, 'UniformOutput', false);
     endif
 
-    data = [{time1}, data];
-    titles = [time1Title, titles];
+    % Add the time
+    for i=numel(lParameters.timeOutputFormat):-1:1
+      if strcmpi(lParameters.timeOutputFormat{i}, 'epoch')
+        data = [{time1}, data];
+
+        lTitle = lParameters.timeOutputTitle{i};
+        if isempty(lTitle), lTitle = 'Epoch'; endif;
+        titles = [lTitle, titles];
+      else
+        lFormat = lParameters.timeOutputFormat{i};
+        lTitle = lParameters.timeOutputTitle{i};
+
+        if isempty(lFormat), lFormat = lParameters.timeFormat1; endif;
+        if isempty(lTitle), lTitle = lParameters.timeColumn1; endif;
+
+        lFormat = Int_ConvertDateFormatForStrfTime(lFormat);
+
+        t = arrayfun(@(v) strftime(lFormat, gmtime(v)), time1, 'UniformOutput', false);
+##        t = arrayfun(@(v) strftime('%Y/%m/%dT%H:%M:%S.000', gmtime(v)), time1, 'UniformOutput', false);
+        data = [{t}, data];
+        titles = [lTitle, titles];
+      endif
+    endfor
+
+##    if ~strcmpi(lParameters.timeOutputFormat, 'epoch')
+##      time1 = arrayfun(@(v) strftime('%Y/%m/%dT%H:%M:%S.000', gmtime(v)), time1, 'UniformOutput', false);
+####      time1 = cellstr(datestr(time1, lParameters.timeOutputFormat));
+##    endif
+##
+##    if ~isempty(lParameters.timeOutputTitle)
+##      time1Title = lParameters.timeOutputTitle;
+##    else
+##      time1Title = lParameters.timeColumn1;
+##    endif
+
+##    data = [{time1}, data];
+##    titles = [time1Title, titles];
 
     if lOptions.verbose, disp("Csv operation done..."); endif;
 
@@ -514,3 +583,18 @@ function STR = Int_BuildOutputColumnName(_titleStr, _infos)
 
   STR = _titleStr;
 endfunction
+
+function _format = Int_ConvertDateFormatForStrfTime(_format)
+  % 'yyyy/mm/ddTHH:MM:SS.FFF'
+  % '%Y/%m/%dT%H:%M:%S.000'
+
+  _format = strrep(_format, 'yyyy', '%Y');
+  _format = strrep(_format, 'mm', '%m');
+  _format = strrep(_format, 'dd', '%d');
+  _format = strrep(_format, 'HH', '%H');
+  _format = strrep(_format, 'MM', '%M');
+  _format = strrep(_format, 'SS', '%S');
+  _format = strrep(_format, 'FFF', '000');
+
+endfunction
+
